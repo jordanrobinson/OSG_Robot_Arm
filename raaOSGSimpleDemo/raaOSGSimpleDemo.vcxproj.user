@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerWorkingDirectory>..\..\..\..\..\raaOSG\raaOSG\OpenSceneGraph-3.0.1-VS10.0.30319-x86-debug-12741\bin</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>..\data\raaRobot.osg</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+</Project>
