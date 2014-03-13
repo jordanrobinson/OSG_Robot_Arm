@@ -19,52 +19,52 @@
 #include <osg/Material>
 
 #include "raaOSGSimpleEventHandler.h"
+#include "raaOSGPrintVisitor.h"
 
-const static float csg_AmbCoef=0.1f;
-const static float csg_DiffCoef=0.8f;
-const static float csg_SpecCoef=1.0f;
+const static float csg_AmbCoef = 0.1f;
+const static float csg_DiffCoef = 0.8f;
+const static float csg_SpecCoef = 1.0f;
 
+osg::Group *g_pRoot = 0;
 
-osg::Group *g_pRoot=0;
-
-osg::Node* makeLitSphere(float fDim, float *afCol)
-{
-	osg::Node *pNode=0;
-	if(afCol)
-	{
-		osg::Geode *pGeode=new osg::Geode();
-		osg::ShapeDrawable *pGeom=new osg::ShapeDrawable(new osg::Sphere(osg::Vec3f(0.0f, 0.0f, 0.0f), fDim));
+osg::Node* makeLitSphere(float fDim, float *afCol) {
+	osg::Node *pNode = 0;
+	if(afCol) {
+		osg::Geode *pGeode = new osg::Geode();
+		osg::ShapeDrawable *pGeom = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3f(0.0f, 0.0f, 0.0f), fDim));
 		pGeode->addDrawable(pGeom);
 
-		osg::Material *pMat=new osg::Material();
+		osg::Material *pMat = new osg::Material();
 
-		pMat->setAmbient(osg::Material::FRONT, osg::Vec4(afCol[0]*csg_AmbCoef, afCol[1]*csg_AmbCoef, afCol[2]*csg_AmbCoef, afCol[0]));
-		pMat->setDiffuse(osg::Material::FRONT, osg::Vec4(afCol[0]*csg_DiffCoef, afCol[1]*csg_DiffCoef, afCol[2]*csg_DiffCoef, afCol[0]));
-		pMat->setSpecular(osg::Material::FRONT, osg::Vec4(afCol[0]*csg_SpecCoef, afCol[1]*csg_SpecCoef, afCol[2]*csg_SpecCoef, afCol[0]));
+		pMat->setAmbient(osg::Material::FRONT, osg::Vec4(afCol[0]*csg_AmbCoef,
+			afCol[1]*csg_AmbCoef, afCol[2]*csg_AmbCoef, afCol[0]));
+		pMat->setDiffuse(osg::Material::FRONT, osg::Vec4(afCol[0]*csg_DiffCoef,
+			afCol[1]*csg_DiffCoef, afCol[2]*csg_DiffCoef, afCol[0]));
+		pMat->setSpecular(osg::Material::FRONT, osg::Vec4(afCol[0]*csg_SpecCoef,
+			afCol[1]*csg_SpecCoef, afCol[2]*csg_SpecCoef, afCol[0]));
 		pMat->setShininess(osg::Material::FRONT, 2.0f);
 
 		pGeode->getOrCreateStateSet()->setAttributeAndModes(pMat, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 		pGeom->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 
-		pNode=pGeode;
+		pNode = pGeode;
 	}
 
 	return pNode;
 }
 
-osg::Node* makeBox(float fDim)
-{
+osg::Node* makeBox(float fDim) {
 	// make a vertex based shape
-	osg::Geode *pGeode=new osg::Geode();
-	osg::Geometry *pGeom=new osg::Geometry();
+	osg::Geode *pGeode = new osg::Geode();
+	osg::Geometry *pGeom = new osg::Geometry();
 
 	pGeode->addDrawable(pGeom);
 
 	pGeom->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
 
-	float fHalfDim=fDim*0.5f;
+	float fHalfDim = fDim*0.5f;
 
-	osg::Vec3Array *pVerts=new osg::Vec3Array();
+	osg::Vec3Array *pVerts = new osg::Vec3Array();
 	pVerts->push_back(osg::Vec3(-fHalfDim, -fHalfDim, -fHalfDim));
 	pVerts->push_back(osg::Vec3(-fHalfDim, fHalfDim, -fHalfDim));
 	pVerts->push_back(osg::Vec3(fHalfDim, fHalfDim, -fHalfDim));
@@ -77,7 +77,7 @@ osg::Node* makeBox(float fDim)
 
 	pGeom->setVertexArray(pVerts);
 
-	osg::DrawElementsUByte *pIndex=new osg::DrawElementsUByte(osg::PrimitiveSet::QUADS, 4);
+	osg::DrawElementsUByte *pIndex = new osg::DrawElementsUByte(osg::PrimitiveSet::QUADS, 4);
 
 	pIndex->push_back(0);
 	pIndex->push_back(1);
@@ -111,7 +111,7 @@ osg::Node* makeBox(float fDim)
 
 	pGeom->addPrimitiveSet(pIndex);
 
-	osg::Vec3Array *pNorms=new osg::Vec3Array();
+	osg::Vec3Array *pNorms = new osg::Vec3Array();
 	pNorms->push_back(osg::Vec3(0.0f, 0.0f, -1.0f));
 	pNorms->push_back(osg::Vec3(0.0f, -1.0f, 0.0f));
 	pNorms->push_back(osg::Vec3(1.0f, 0.0f, 0.0f));
@@ -122,7 +122,7 @@ osg::Node* makeBox(float fDim)
 	pGeom->setNormalArray(pNorms);
 	pGeom->setNormalBinding(osg::Geometry::BIND_PER_PRIMITIVE);
 
-	osg::Vec4Array *pCols=new osg::Vec4Array();
+	osg::Vec4Array *pCols = new osg::Vec4Array();
 	pCols->push_back(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	pCols->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
 	pCols->push_back(osg::Vec4(0.0f, 0.0f, 1.0f, 1.0f));
@@ -138,17 +138,16 @@ osg::Node* makeBox(float fDim)
 	return pGeode;
 }
 
-int main(int argc,char* argv[])
-{
-	osg::ArgumentParser arguments(&argc,argv);
+int main(int argc, char* argv[]) {
+	osg::ArgumentParser arguments(&argc, argv);
 
-	g_pRoot=new osg::Group();
+	g_pRoot = new osg::Group();
 	g_pRoot->ref();
 
 	// load model
 	g_pRoot->addChild(osgDB::readNodeFiles(arguments));
 
-/* RAA::Exercise 2
+	/* RAA::Exercise 2
 	// add unlit cube made from verts
 	osg::Matrixf m;
 	m.makeTranslate(10.0f, 0.0f, 0.0f);
@@ -167,7 +166,7 @@ int main(int argc,char* argv[])
 	pMT1->addChild(makeLitSphere(4.0f, afCol));
 	pMT1->setMatrix(m);
 	g_pRoot->addChild(pMT1);
-*/
+	*/
 	// setup viewer
 	osgViewer::Viewer viewer;
 
@@ -191,12 +190,12 @@ int main(int argc,char* argv[])
 	osg::Camera *pCamera = viewer.getCamera();
 
 	pCamera->setGraphicsContext(pGC);
-	pCamera->setViewport(new osg::Viewport(0,0, pTraits->width, pTraits->height));
+	pCamera->setViewport(new osg::Viewport(0, 0, pTraits->width, pTraits->height));
 
-/* RAA::Exercise 3 
+	// RAA::Exercise 3 
 	// add custom handler -> press 'i' for info, 'p' for rendering modes
-	viewer.addEventHandler(new raaOSGSimpleEventHandler());
-*/
+	viewer.addEventHandler(new raaOSGSimpleEventHandler()); 
+
 	// add the thread model handler -> press 'm'
 	viewer.addEventHandler(new osgViewer::ThreadingHandler);
 
@@ -222,6 +221,10 @@ int main(int argc,char* argv[])
 	viewer.setSceneData(g_pRoot);
 
 	viewer.realize();
+
+	//print out the nodes before run
+	raaOSGPrintVisitor printer;
+	printer.traverse(*(viewer.getScene()->getSceneData()));
 
 	return viewer.run();
 }
