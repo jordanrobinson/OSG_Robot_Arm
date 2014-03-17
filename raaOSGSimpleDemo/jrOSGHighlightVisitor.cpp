@@ -15,20 +15,20 @@ jrOSGHighlightVisitor::~jrOSGHighlightVisitor(void) {
 
 void jrOSGHighlightVisitor::apply(osg::Node &node) {
 	if (node.getName().find("ForeArm.Flat") != std::string::npos) {
-		//std::cout << "highlighting: " << node.getName() << std::endl;
-		//osgFX::Scribe* scribe = new osgFX::Scribe();
-		//osg::Group* parent = node.getParent(0);
-		//
-		//scribe->setName("highlighted");
-		//scribe->setWireframeColor(osg::Vec4(0,1,0,0.5));
-		//scribe->addChild(&node);
-		//
-		//parent->replaceChild(&node, scribe);
-
+		std::cout << "highlighting: " << node.getName() << std::endl;
+		osgFX::Scribe* scribe = new osgFX::Scribe();
 		osg::Group* parent = node.getParent(0);
+		
+		scribe->setName("highlighted");
+		scribe->setWireframeColor(osg::Vec4(0,1,0,0.5));
+		scribe->addChild(&node);
+		
+		parent->replaceChild(&node, scribe);
 
+		parent = node.getParent(0);
+		
 		osg::MatrixTransform* transform = new osg::MatrixTransform;
-
+		
 		const double angle = 0.1;
 		const osg::Vec3d axis(0, 0, 1);
 		transform->setMatrix(osg::Matrix::rotate(angle, axis));
@@ -44,6 +44,9 @@ void jrOSGHighlightVisitor::apply(osg::Node &node) {
 		parent->replaceChild(&node, scribe->getChild(0));
 		return;
 	}
+
+
+
 
 	traverse(node);
 }
