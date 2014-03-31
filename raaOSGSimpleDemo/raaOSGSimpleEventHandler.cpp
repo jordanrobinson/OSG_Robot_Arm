@@ -5,9 +5,14 @@
 
 #include "raaOSGPrintVisitor.h"
 #include "jrOSGHighlightVisitor.h"
+#include "jrOSGHighlighter.h"
+#include "jrOSGRotator.h"
+#include "jrOSGNodeFinder.h"
 
 #include "raaOSGSimpleEventHandler.h"
 
+bool highlighted;
+double rotateAngle;
 
 raaOSGSimpleEventHandler::raaOSGSimpleEventHandler() {
 	m_mMode = osg::PolygonMode::FILL;
@@ -24,9 +29,35 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 			switch(ea.getKey()) {
 			case 'a':
 			case 'A': {
-				jrOSGHighlightVisitor highlighter;
+				//jrOSGHighlightVisitor highlighter;
+				//highlighter.traverse(*(pViewer->getScene()->getSceneData()));
 
-				highlighter.traverse(*(pViewer->getScene()->getSceneData()));
+
+				jrOSGNodeFinder finder("UpperArm_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				if (!highlighted) {
+					jrOSGHighlighter highlighter;
+					highlighter.highlight(node, "testHighlight");
+					highlighted = true;
+				}
+
+				jrOSGRotator rotator;
+
+				jrOSGNodeFinder transFinder("testRotate");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* transform = finder.getNode();
+
+				if (transform == NULL) {
+					rotateAngle = 0.1;
+					rotator.rotate(node, "testRotate", rotateAngle);
+				}
+				else {
+					rotateAngle += 0.1;
+					rotator.rotate(transform, rotateAngle);
+				}
+
 					  }
 					  return true;
 			case 'i':
@@ -42,6 +73,21 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 					new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, progressMode()),
 					osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 				return true;
+			}
+		}
+		else if (pViewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYUP && highlighted) {
+			switch(ea.getKey()) {
+			case 'a':
+			case 'A': {
+				osg::Node* node;
+				jrOSGNodeFinder finder("testHighlight");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				node = finder.getNode();
+
+				jrOSGHighlighter highlighter;
+				highlighter.unhighlight(node);
+				highlighted = false;
+					  }
 			}
 		}
 		return false;
