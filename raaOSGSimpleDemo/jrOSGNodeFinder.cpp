@@ -7,6 +7,7 @@
 
 jrOSGNodeFinder::jrOSGNodeFinder(const std::string& name) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {
 	nodeName = name;
+	targetNode = NULL;
 }
 
 jrOSGNodeFinder::~jrOSGNodeFinder(void) {

@@ -20,6 +20,9 @@
 
 #include "raaOSGSimpleEventHandler.h"
 #include "raaOSGPrintVisitor.h"
+#include "jrOSGNodeFinder.h"
+#include "jrOSGRotatorDataType.h"
+#include "jrOSGRotateCallback.h"
 
 const static float csg_AmbCoef = 0.1f;
 const static float csg_DiffCoef = 0.8f;
@@ -225,6 +228,33 @@ int main(int argc, char* argv[]) {
 	//print out the nodes before run
 	raaOSGPrintVisitor printer;
 	printer.traverse(*(viewer.getScene()->getSceneData()));
+	
+	jrOSGNodeFinder finder("Body_Rotator");
+	finder.traverse(*(viewer.getScene()->getSceneData()));
+
+	jrOSGRotatorDataType* rotatorData = new jrOSGRotatorDataType(finder.getNode());
+	finder.getNode()->setUserData(rotatorData);
+	finder.getNode()->setUpdateCallback(new jrOSGRotateCallback);
+
+	//Body_Rotator
+	//UpperArm_Rotator
+	//LowerArm_Rotator
+	//Hand1_Rotator
+	//Hand2_Rotator
+	//Hand3_Rotator
+
+	//jrOSGNodeFinder finder("Body_Rotator");
+	//finder.traverse(*(viewer.getScene()->getSceneData()));
+	//jrOSGSwitchSetup* setup = new jrOSGSwitchSetup;
+	//setup->addSwitch(finder.getNode());
+	//
+	//jrOSGNodeFinder lowerFinder("LowerArm_Rotator");
+	//lowerFinder.traverse(*(viewer.getScene()->getSceneData()));
+	//setup->addSwitch(lowerFinder.getNode());
+
+	//jrOSGNodeFinder upperFinder("UpperArm_Rotator");
+	//upperFinder.traverse(*(viewer.getScene()->getSceneData()));
+	//setup->addSwitch(upperFinder.getNode());
 
 	return viewer.run();
 }
