@@ -6,14 +6,14 @@
 
 class jrOSGRotatorDataType : public osg::Referenced {
 public:
-	bool isRotating;
+	bool rotateLeft;
+	bool rotateRight;
+	bool highlighted;
 	jrOSGRotatorDataType(osg::Node* node);
 	virtual ~jrOSGRotatorDataType(void);
 	void jrOSGRotatorDataType::updateRotation();
-
-
-
-
+	void jrOSGRotatorDataType::highlight();
+	
 protected:
 	double rotateAngle;
 	osg::Node* bodyRotator;

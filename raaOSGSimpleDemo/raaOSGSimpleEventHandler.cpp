@@ -13,20 +13,12 @@
 
 #include "raaOSGSimpleEventHandler.h"
 #include "jrOSGSwitchSetup.h"
+#include "jrOSGRotatorDataType.h"
 
 
 bool highlighted;
 double rotateAngle;
-
-
-
-//Body_Rotator
-//UpperArm_Rotator
-//LowerArm_Rotator
-//Hand1_Rotator
-//Hand2_Rotator
-//Hand3_Rotator
-
+osg::Node *g_pRoot = 0;
 
 raaOSGSimpleEventHandler::raaOSGSimpleEventHandler() {
 	m_mMode = osg::PolygonMode::FILL;
@@ -47,47 +39,55 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 				//highlighter.traverse(*(pViewer->getScene()->getSceneData()));
 
 
-				jrOSGNodeFinder finder("Body_Rotator");
-				finder.traverse(*(pViewer->getScene()->getSceneData()));
-				osg::Node* node = finder.getNode();
-
-				jrOSGHighlighter highlighter;
-
-
-				if (!highlighted && rotateAngle < 0.8) {
-
-					highlighter.highlightGreen(node, "testHighlight");
-					highlighted = true;
-				}
-				if (rotateAngle > 0.8 && !highlighted) {
-					//if (highlighted) {
-					//	highlighter.unhighlight(node);
-					//}
-
-					highlighter.highlightRed(node, "testHighlight");
-					highlighted = true;
-					rotateAngle = 0.8;
-
+				if (!g_pRoot) {
+					jrOSGNodeFinder finder("Body_Rotator");
+					finder.traverse(*(pViewer->getScene()->getSceneData()));
+					g_pRoot = finder.getNode();
 				}
 
-				jrOSGRotator rotator;
+				osg::ref_ptr<jrOSGRotatorDataType> rotatorData = dynamic_cast<jrOSGRotatorDataType*> (g_pRoot->getUserData());
+				rotatorData->rotateLeft = true;
 
-				jrOSGNodeFinder transFinder("testRotate");
 
-				transFinder.traverse(*(pViewer->getScene()->getSceneData()));
-				osg::Node* transform = transFinder.getNode();
+				//osg::Node* node = finder.getNode();
 
-				std::cout << transform << std::endl;
+				//jrOSGHighlighter highlighter;
 
-				if (transform == NULL) {
-					rotateAngle = 0.05;
-					rotator.rotate(node, "testRotate", rotateAngle);
-				}
-				else {
-					rotateAngle += 0.05;
-					rotator.rotate(transform, rotateAngle);
-				}
-				std::cout << "angle currently: " << rotateAngle << std::endl;
+
+				//if (!highlighted && rotateAngle < 0.8) {
+
+				//	highlighter.highlightGreen(node, "testHighlight");
+				//	highlighted = true;
+				//}
+				//if (rotateAngle > 0.8 && !highlighted) {
+				//	//if (highlighted) {
+				//	//	highlighter.unhighlight(node);
+				//	//}
+
+				//	highlighter.highlightRed(node, "testHighlight");
+				//	highlighted = true;
+				//	rotateAngle = 0.8;
+
+				//}
+
+				//jrOSGRotator rotator;
+
+				//jrOSGNodeFinder transFinder("testRotate");
+
+				//transFinder.traverse(*(pViewer->getScene()->getSceneData()));
+				//osg::Node* transform = transFinder.getNode();
+
+				//std::cout << transform << std::endl;
+
+				//if (transform == NULL) {
+				//	rotateAngle = 0.05;
+				//	rotator.rotate(node, "testRotate", rotateAngle);
+				//}
+				//else {
+				//	rotateAngle += 0.05;
+				//	rotator.rotate(node, rotateAngle);
+				//}
+				//std::cout << "angle currently: " << rotateAngle << std::endl;
 					  }
 					  return true;
 			case 'i':
@@ -100,20 +100,21 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 			case 's':
 			case 'S': {
 
-				jrOSGNodeFinder finder("Switch_Body_Rotator");
-				finder.traverse(*(pViewer->getScene()->getSceneData()));
-				osg::Node* node = finder.getNode();
 
-				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+				if (!g_pRoot) {
+					jrOSGNodeFinder finder("Body_Rotator");
+					finder.traverse(*(pViewer->getScene()->getSceneData()));
+					g_pRoot = finder.getNode();
+				}
 
-				osgSwitch->setSingleChildOn(1);
-
+				osg::ref_ptr<jrOSGRotatorDataType> rotatorData = dynamic_cast<jrOSGRotatorDataType*> (g_pRoot->getUserData());
+				rotatorData->rotateRight = true;
 					  }
 					  return true;
 			case 'd':
 			case 'D': {
 
-				jrOSGNodeFinder finder("Switch_Body_Rotator");
+				jrOSGNodeFinder finder("Switch_Hand1_Rotator");
 				finder.traverse(*(pViewer->getScene()->getSceneData()));
 				osg::Node* node = finder.getNode();
 
@@ -136,17 +137,31 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 			}
 		}
 		else if (pViewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYUP && highlighted) {
+
+			jrOSGNodeFinder finder("Switch_Hand1_Rotator");
+			finder.traverse(*(pViewer->getScene()->getSceneData()));
+			osg::Node* node = finder.getNode();
+
+			osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+			osgSwitch->setSingleChildOn(1);
+
+
+
+
+
+
 			switch(ea.getKey()) {
 			case 'a':
 			case 'A': {
-				osg::Node* node;
-				jrOSGNodeFinder finder("testHighlight");
-				finder.traverse(*(pViewer->getScene()->getSceneData()));
-				node = finder.getNode();
+				//osg::Node* node;
+				//jrOSGNodeFinder finder("testHighlight");
+				//finder.traverse(*(pViewer->getScene()->getSceneData()));
+				//node = finder.getNode();
 
-				jrOSGHighlighter highlighter;
-				highlighter.unhighlight(node);
-				highlighted = false;
+				//jrOSGHighlighter highlighter;
+				//highlighter.unhighlight(node);
+				//highlighted = false;
 					  }
 			}
 		}
