@@ -124,6 +124,32 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 
 					  }
 					  return true;
+			case 'f':
+			case 'F': {
+
+				jrOSGNodeFinder finder("Switch_LowerArm_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+				osgSwitch->setSingleChildOn(0);
+
+					  }
+					  return true;
+			case 'g':
+			case 'G': {
+
+				jrOSGNodeFinder finder("Switch_UpperArm_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+				osgSwitch->setSingleChildOn(0);
+
+					  }
+					  return true;
 
 
 
@@ -136,22 +162,47 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 				return true;
 			}
 		}
-		else if (pViewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYUP && highlighted) {
-
-			jrOSGNodeFinder finder("Switch_Hand1_Rotator");
-			finder.traverse(*(pViewer->getScene()->getSceneData()));
-			osg::Node* node = finder.getNode();
-
-			osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
-
-			osgSwitch->setSingleChildOn(1);
-
-
-
-
-
-
+		else if (pViewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYUP) {
 			switch(ea.getKey()) {
+			case 'd':
+			case 'D': {
+
+				jrOSGNodeFinder finder("Switch_Hand1_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+				osgSwitch->setSingleChildOn(1);
+
+					  }
+					  return true;
+			case 'f':
+			case 'F': {
+
+				jrOSGNodeFinder finder("Switch_LowerArm_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+				osgSwitch->setSingleChildOn(1);
+
+					  }
+					  return true;
+			case 'g':
+			case 'G': {
+
+				jrOSGNodeFinder finder("Switch_UpperArm_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+				osgSwitch->setSingleChildOn(1);
+
+					  }
+					  return true;
 			case 'a':
 			case 'A': {
 				//osg::Node* node;

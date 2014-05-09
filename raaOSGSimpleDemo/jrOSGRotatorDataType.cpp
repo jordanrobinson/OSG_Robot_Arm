@@ -22,17 +22,20 @@ jrOSGRotatorDataType::jrOSGRotatorDataType(osg::Node* node) {
 	jrOSGNodeFinder upperArmFinder("UpperArm_Rotator");
 	upperArmFinder.traverse(*(node));
 	upperArmRotator = upperArmFinder.getNode();
-	//setup.addSwitch(upperArmRotator);
+	osg::Group* upperArmRotatorGroup = dynamic_cast<osg::Group*>(upperArmRotator);
+	setup.addSwitch(upperArmRotatorGroup);
 
 	jrOSGNodeFinder lowerArmFinder("LowerArm_Rotator");
 	lowerArmFinder.traverse(*(node));
 	lowerArmRotator = lowerArmFinder.getNode();
-	//setup.addSwitch(lowerArmRotator);
+	osg::Group* lowerArmRotatorGroup = dynamic_cast<osg::Group*>(lowerArmRotator);
+	setup.addSwitch(lowerArmRotatorGroup);
 
 	jrOSGNodeFinder hand1Finder("Hand1_Rotator");
 	hand1Finder.traverse(*(node));
 	hand1Rotator = hand1Finder.getNode();
-	setup.addSwitch(hand1Rotator);
+	osg::Group* hand1RotatorGroup = dynamic_cast<osg::Group*>(hand1Rotator);
+	setup.addSwitch(hand1RotatorGroup);
 
 	jrOSGNodeFinder hand2Finder("Hand2_Rotator");
 	hand2Finder.traverse(*(node));

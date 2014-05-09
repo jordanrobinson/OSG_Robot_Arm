@@ -1,11 +1,11 @@
 #pragma once
 
-#include <osg\Node>
+#include <osg\Group>
 
 class jrOSGSwitchSetup {
 public:
 	jrOSGSwitchSetup(void);
 	virtual ~jrOSGSwitchSetup(void);
 
-	virtual void addSwitch(osg::Node* node);
+	virtual void addSwitch(osg::Group* group);
 };
