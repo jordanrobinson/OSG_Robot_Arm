@@ -195,10 +195,6 @@ int main(int argc, char* argv[]) {
 	pCamera->setGraphicsContext(pGC);
 	pCamera->setViewport(new osg::Viewport(0, 0, pTraits->width, pTraits->height));
 
-	// RAA::Exercise 3 
-	// add custom handler -> press 'i' for info, 'p' for rendering modes
-	viewer.addEventHandler(new raaOSGSimpleEventHandler()); 
-
 	// add the thread model handler -> press 'm'
 	viewer.addEventHandler(new osgViewer::ThreadingHandler);
 
@@ -228,7 +224,7 @@ int main(int argc, char* argv[]) {
 	//print out the nodes before run
 	raaOSGPrintVisitor printer;
 	printer.traverse(*(viewer.getScene()->getSceneData()));
-	
+
 	jrOSGNodeFinder finder("Body_Rotator");
 	finder.traverse(*(viewer.getScene()->getSceneData()));
 
@@ -255,6 +251,10 @@ int main(int argc, char* argv[]) {
 	//jrOSGNodeFinder upperFinder("UpperArm_Rotator");
 	//upperFinder.traverse(*(viewer.getScene()->getSceneData()));
 	//setup->addSwitch(upperFinder.getNode());
+
+	// RAA::Exercise 3 
+	// add custom handler -> press 'i' for info, 'p' for rendering modes
+	viewer.addEventHandler(new raaOSGSimpleEventHandler(&viewer)); 
 
 	return viewer.run();
 }

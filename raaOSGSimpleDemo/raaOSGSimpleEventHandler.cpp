@@ -3,7 +3,11 @@
 #include <osgViewer/Viewer>
 #include <osg/StateSet>
 
+#include <Windows.h>
+
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "raaOSGPrintVisitor.h"
 #include "jrOSGHighlightVisitor.h"
@@ -15,13 +19,18 @@
 #include "jrOSGSwitchSetup.h"
 #include "jrOSGRotatorDataType.h"
 
-
-bool highlighted;
 double rotateAngle;
 osg::Node *g_pRoot = 0;
+osg::ref_ptr<jrOSGRotatorDataType> g_pRotatorData = 0;
 
-raaOSGSimpleEventHandler::raaOSGSimpleEventHandler() {
+raaOSGSimpleEventHandler::raaOSGSimpleEventHandler(osgViewer::Viewer* pViewer) {
 	m_mMode = osg::PolygonMode::FILL;
+	if (!g_pRoot) {
+		jrOSGNodeFinder finder("Body_Rotator");
+		finder.traverse(*(pViewer->getScene()->getSceneData()));
+		g_pRoot = finder.getNode();
+		g_pRotatorData = dynamic_cast<jrOSGRotatorDataType*> (g_pRoot->getUserData());
+	}
 }
 
 raaOSGSimpleEventHandler::~raaOSGSimpleEventHandler(void) {
@@ -35,61 +44,52 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 			switch(ea.getKey()) {
 			case 'a':
 			case 'A': {
-				//jrOSGHighlightVisitor highlighter;
-				//highlighter.traverse(*(pViewer->getScene()->getSceneData()));
-
-
-				if (!g_pRoot) {
-					jrOSGNodeFinder finder("Body_Rotator");
-					finder.traverse(*(pViewer->getScene()->getSceneData()));
-					g_pRoot = finder.getNode();
-				}
-
-				osg::ref_ptr<jrOSGRotatorDataType> rotatorData = dynamic_cast<jrOSGRotatorDataType*> (g_pRoot->getUserData());
-				rotatorData->rotateLeft = true;
-
-
-				//osg::Node* node = finder.getNode();
-
-				//jrOSGHighlighter highlighter;
-
-
-				//if (!highlighted && rotateAngle < 0.8) {
-
-				//	highlighter.highlightGreen(node, "testHighlight");
-				//	highlighted = true;
-				//}
-				//if (rotateAngle > 0.8 && !highlighted) {
-				//	//if (highlighted) {
-				//	//	highlighter.unhighlight(node);
-				//	//}
-
-				//	highlighter.highlightRed(node, "testHighlight");
-				//	highlighted = true;
-				//	rotateAngle = 0.8;
-
-				//}
-
-				//jrOSGRotator rotator;
-
-				//jrOSGNodeFinder transFinder("testRotate");
-
-				//transFinder.traverse(*(pViewer->getScene()->getSceneData()));
-				//osg::Node* transform = transFinder.getNode();
-
-				//std::cout << transform << std::endl;
-
-				//if (transform == NULL) {
-				//	rotateAngle = 0.05;
-				//	rotator.rotate(node, "testRotate", rotateAngle);
-				//}
-				//else {
-				//	rotateAngle += 0.05;
-				//	rotator.rotate(node, rotateAngle);
-				//}
-				//std::cout << "angle currently: " << rotateAngle << std::endl;
+				g_pRotatorData->bodyConfig->rotateLeft = true;
 					  }
 					  return true;
+			case 's':
+			case 'S': {
+				g_pRotatorData->bodyConfig->rotateRight = true;
+					  }
+					  return true;
+			case 'q':
+			case 'Q': {
+				g_pRotatorData->upperArmConfig->rotateLeft = true;
+					  }
+					  return true;
+			case 'w':
+			case 'W': {
+				g_pRotatorData->upperArmConfig->rotateRight = true;
+					  }
+					  return true;
+			case 'g':
+			case 'G': {
+
+				jrOSGNodeFinder finder("Switch_Hand2_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+				osgSwitch->setSingleChildOn(2);
+
+					  }
+					  return true;
+			case 'h':
+			case 'H': {
+
+				jrOSGNodeFinder finder("Switch_Hand3_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+				osgSwitch->setSingleChildOn(2);
+
+					  }
+					  return true;
+
+
 			case 'i':
 			case 'I': {
 				raaOSGPrintVisitor printer;
@@ -97,88 +97,113 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 				printer.traverse(*(pViewer->getScene()->getSceneData()));
 					  }
 					  return true;
-			case 's':
-			case 'S': {
-
-
-				if (!g_pRoot) {
-					jrOSGNodeFinder finder("Body_Rotator");
-					finder.traverse(*(pViewer->getScene()->getSceneData()));
-					g_pRoot = finder.getNode();
-				}
-
-				osg::ref_ptr<jrOSGRotatorDataType> rotatorData = dynamic_cast<jrOSGRotatorDataType*> (g_pRoot->getUserData());
-				rotatorData->rotateRight = true;
-					  }
-					  return true;
-			case 'd':
-			case 'D': {
-
-				jrOSGNodeFinder finder("Switch_Hand1_Rotator");
-				finder.traverse(*(pViewer->getScene()->getSceneData()));
-				osg::Node* node = finder.getNode();
-
-				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
-
-				osgSwitch->setSingleChildOn(0);
-
-					  }
-					  return true;
-			case 'f':
-			case 'F': {
-
-				jrOSGNodeFinder finder("Switch_LowerArm_Rotator");
-				finder.traverse(*(pViewer->getScene()->getSceneData()));
-				osg::Node* node = finder.getNode();
-
-				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
-
-				osgSwitch->setSingleChildOn(0);
-
-					  }
-					  return true;
-			case 'g':
-			case 'G': {
-
-				jrOSGNodeFinder finder("Switch_UpperArm_Rotator");
-				finder.traverse(*(pViewer->getScene()->getSceneData()));
-				osg::Node* node = finder.getNode();
-
-				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
-
-				osgSwitch->setSingleChildOn(0);
-
-					  }
-					  return true;
-
-
-
-
 			case 'p':
 			case 'P':
 				pViewer->getSceneData()->getOrCreateStateSet()->setAttributeAndModes(
 					new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, progressMode()),
 					osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 				return true;
+			case '4': {
+				g_pRotatorData->animate(0, g_pRotatorData->bodyConfig);
+				g_pRotatorData->animate(0, g_pRotatorData->upperArmConfig);
+				g_pRotatorData->animate(0, g_pRotatorData->lowerArmConfig);
+					  }
+					  return true;
+			case '5': {
+				g_pRotatorData->animate(0.5, g_pRotatorData->bodyConfig);
+				g_pRotatorData->animate(-0.6, g_pRotatorData->upperArmConfig);
+				g_pRotatorData->animate(0.5, g_pRotatorData->lowerArmConfig);
+					  }
+					  return true;
+			case '6': {
+
+				for (int i = 0; i < 6; i++) {
+					g_pRotatorData->recordedAnimateCoords[i] = g_pRotatorData->configs[i]->rotateAngle;
+				}
+					  }
+					  return true;
+			case '7': {
+				for (int i = 0; i < 6; i++) {
+					g_pRotatorData->animate(g_pRotatorData->recordedAnimateCoords[i], g_pRotatorData->configs[i]);
+				}
+					  }
+					  return true;
+			case '8': {
+				for (int i = 0; i < 6; i++) {
+					g_pRotatorData->animate(g_pRotatorData->configs[i]->undoAnimateAngle, g_pRotatorData->configs[i]);
+				}
+					  }
+					  return true;
+			case '9': {
+				std::ofstream file;
+				//time_t t = time(0);
+				//std::stringstream ss;
+				//ss << t;
+				//std::string filename = ss.str();
+				std::string filename = "test";
+				filename.append(".txt");
+				file.open(filename);
+				std::cout << filename << std::endl;
+
+				for (int i = 0; i < 6; i++) {
+					file << g_pRotatorData->configs[i]->rotateAngle << ",";
+				}
+
+				file << "";
+				file.close();
+					  }
+					  return true;
+			case '0': {
+				std::ofstream file;
+				std::string filename = "test";
+				filename.append(".txt");
+				file.open(filename);
+				std::cout << filename << std::endl;
+
+				
+
+				for (int i = 0; i < 6; i++) {
+					file << g_pRotatorData->configs[i]->rotateAngle << ",";
+				}
+
+				file << "";
+				file.close();
+					  }
+					  return true;
 			}
 		}
 		else if (pViewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYUP) {
 			switch(ea.getKey()) {
-			case 'd':
-			case 'D': {
-
-				jrOSGNodeFinder finder("Switch_Hand1_Rotator");
+			case 'a':
+			case 'A': 
+			case 's':
+			case 'S': {
+				jrOSGNodeFinder finder("Switch_Body_Rotator");
 				finder.traverse(*(pViewer->getScene()->getSceneData()));
 				osg::Node* node = finder.getNode();
 
 				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
 
-				osgSwitch->setSingleChildOn(1);
+				osgSwitch->setSingleChildOn(0);
 
 					  }
 					  return true;
-			case 'f':
-			case 'F': {
+			case 'q':
+			case 'Q': 
+			case 'w':
+			case 'W': {
+				jrOSGNodeFinder finder("Switch_UpperArm_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+				osgSwitch->setSingleChildOn(0);
+
+					  }
+					  return true;
+			case 'd':
+			case 'D': {
 
 				jrOSGNodeFinder finder("Switch_LowerArm_Rotator");
 				finder.traverse(*(pViewer->getScene()->getSceneData()));
@@ -186,34 +211,49 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 
 				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
 
-				osgSwitch->setSingleChildOn(1);
+				osgSwitch->setSingleChildOn(0);
+
+					  }
+					  return true;
+			case 'f':
+			case 'F': {
+
+				jrOSGNodeFinder finder("Switch_Hand1_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+				osgSwitch->setSingleChildOn(0);
 
 					  }
 					  return true;
 			case 'g':
 			case 'G': {
 
-				jrOSGNodeFinder finder("Switch_UpperArm_Rotator");
+				jrOSGNodeFinder finder("Switch_Hand2_Rotator");
 				finder.traverse(*(pViewer->getScene()->getSceneData()));
 				osg::Node* node = finder.getNode();
 
 				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
 
-				osgSwitch->setSingleChildOn(1);
+				osgSwitch->setSingleChildOn(0);
 
 					  }
 					  return true;
-			case 'a':
-			case 'A': {
-				//osg::Node* node;
-				//jrOSGNodeFinder finder("testHighlight");
-				//finder.traverse(*(pViewer->getScene()->getSceneData()));
-				//node = finder.getNode();
+			case 'h':
+			case 'H': {
 
-				//jrOSGHighlighter highlighter;
-				//highlighter.unhighlight(node);
-				//highlighted = false;
+				jrOSGNodeFinder finder("Switch_Hand3_Rotator");
+				finder.traverse(*(pViewer->getScene()->getSceneData()));
+				osg::Node* node = finder.getNode();
+
+				osg::Switch* osgSwitch = dynamic_cast<osg::Switch*>(node);
+
+				osgSwitch->setSingleChildOn(0);
+
 					  }
+					  return true;
 			}
 		}
 		return false;

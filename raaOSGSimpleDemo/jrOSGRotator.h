@@ -8,5 +8,5 @@ public:
 	virtual ~jrOSGRotator(void);
 
 	virtual void rotate(osg::Node* node, const std::string name, double angle);
-	virtual void rotate(osg::Node* node, double angle);
+	virtual void rotate(osg::Node* node, double angle, osg::Vec3d axis);
 };

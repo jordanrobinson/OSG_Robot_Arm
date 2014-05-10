@@ -2,8 +2,8 @@
 #include <windows.h>
 #include <iostream>
 #include <osgFX/Scribe>
-#include <osg/MatrixTransform>
 #include <osg/Switch>
+#include <osg/MatrixTransform>
 #include "jrOSGSwitchSetup.h"
 
 jrOSGSwitchSetup::jrOSGSwitchSetup(void) {
@@ -13,26 +13,22 @@ jrOSGSwitchSetup::jrOSGSwitchSetup(void) {
 jrOSGSwitchSetup::~jrOSGSwitchSetup(void) {
 }
 
-void jrOSGSwitchSetup::addSwitch(osg::Group* group) {
+osg::Switch* jrOSGSwitchSetup::addSwitch(osg::Group* group) {
 
-	//osg::Group* parent = node->getParent(0);
 	osg::Switch* osgSwitch = new osg::Switch;
 	osgFX::Scribe* osgSwitchOn = new osgFX::Scribe;
+	osgFX::Scribe* osgSwitchError = new osgFX::Scribe;
 	osg::Group* osgSwitchOff = new osg::Group;
-	//osg::Group* osgSwitchOn = new osg::Group;
 
-	//std::cout << node->className() << " Name: " << node->getName() << " Lib: " << node->libraryName() << " Parents: " << node->getNumParents() << std::endl;
-
-
-	osgSwitch->addChild(osgSwitchOn);
 	osgSwitch->addChild(osgSwitchOff);
-
+	osgSwitch->addChild(osgSwitchOn);
+	osgSwitch->addChild(osgSwitchError);
 
 	for (int i = 0; i < group->getNumChildren(); i++) {
 		if (group->getChild(i)->asGeode()) {
-			std::cout << " Name: " << group->getChild(i)->getName() << std::endl;
 			osgSwitchOn->addChild(group->getChild(i));
 			osgSwitchOff->addChild(group->getChild(i));
+			osgSwitchError->addChild(group->getChild(i));
 		}
 	}
 
@@ -45,29 +41,23 @@ void jrOSGSwitchSetup::addSwitch(osg::Group* group) {
 	scribeName.append(group->getName());
 
 	osgSwitchOn->setName(scribeName);
-	osgSwitchOn->setWireframeColor(osg::Vec4(0,1,0,0.5));
+	osgSwitchOn->setWireframeColor(osg::Vec4(0,0.8,0,0.5));
+
+	std::string errorName("Error_Highlight_");
+	errorName.append(group->getName());
+
+	osgSwitchError->setName(scribeName);
+	osgSwitchError->setWireframeColor(osg::Vec4(0.8,0,0,0.5));
 
 	std::string switchName("Switch_");
 	switchName.append(group->getName());
 	osgSwitch->setName(switchName);
 
+	std::string switchOffName("Switch_Off_");
+	switchOffName.append(group->getName());
+	osgSwitchOff->setName(switchOffName);
+
 	osgSwitch->setSingleChildOn(0);
+	return osgSwitch;
 
-	//
-	//std::string switchName("Switch_");
-	//switchName.append(node->getName());
-	//osgSwitch->setName(switchName);
-
-	//parent->addChild(osgSwitch);
-	//parent->removeChild(node);
-	//osgSwitch->addChild(scribe);
-	//osgSwitch->setName(switchName);
-
-	//osgSwitchOff->addChild(node);
-	//std::string switchOffName("Switch_Off_");
-	//switchOffName.append(node->getName());
-	//osgSwitchOff->setName(switchOffName);
-
-	//osgSwitch->addChild(osgSwitchOff);
-	//osgSwitch->setSingleChildOn(1);
 }
