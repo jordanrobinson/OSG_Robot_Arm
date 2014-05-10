@@ -35,8 +35,6 @@ void jrOSGRotator::rotate(osg::Node* node, double angle, osg::Vec3d axis) {
 	trans.y() *= -1;
 	trans.z() *= -1;
 
-
-
 	osg::Matrix matrix = osg::Matrix::translate(trans) * osg::Matrix::rotate(angle, axis);
 
 	matrixTrans->setMatrix(matrix);

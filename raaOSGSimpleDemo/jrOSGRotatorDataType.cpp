@@ -24,7 +24,7 @@ jrOSGRotatorDataType::jrOSGRotatorDataType(osg::Node* node) {
 	hand2Config->axis = osg::Vec3d(0, 0, 1);
 	hand3Config->axis = osg::Vec3d(0, 1, 0);
 	hand3Config->maxAngle = 1.7;
-	hand3Config->minAngle = 1.7;
+	hand3Config->minAngle = -1.7;
 
 	configs[0] = bodyConfig;
 	configs[1] = upperArmConfig;
