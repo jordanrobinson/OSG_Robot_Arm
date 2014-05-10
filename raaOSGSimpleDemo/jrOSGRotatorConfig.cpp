@@ -12,7 +12,7 @@ jrOSGRotatorConfig::jrOSGRotatorConfig() {
 	maxAngle = 0.7;
 	newAngle = 0;
 	undoAnimateAngle = 0;
-	axis = osg::Vec3d(0, 0, 1);
+	axis = osg::Vec3d(1, 0, 0);
 	animating = false;
 	osgSwitch = 0;
 	rotator = 0;

@@ -44,7 +44,7 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 			switch(ea.getKey()) {
 			case 'a':
 			case 'A': {
-				g_pRotatorData->bodyConfig->rotateLeft = true;
+				g_pRotatorData->hand3Config->rotateLeft = true;
 					  }
 					  return true;
 			case 's':
@@ -112,7 +112,11 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 			case '5': {
 				g_pRotatorData->animate(0.5, g_pRotatorData->bodyConfig);
 				g_pRotatorData->animate(-0.6, g_pRotatorData->upperArmConfig);
-				g_pRotatorData->animate(0.5, g_pRotatorData->lowerArmConfig);
+				g_pRotatorData->animate(0.3, g_pRotatorData->lowerArmConfig);
+				g_pRotatorData->animate(-0.7, g_pRotatorData->hand1Config);
+				g_pRotatorData->animate(0.7, g_pRotatorData->hand2Config);
+				g_pRotatorData->animate(-0.7, g_pRotatorData->hand3Config);
+
 					  }
 					  return true;
 			case '6': {
@@ -136,11 +140,11 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 					  return true;
 			case '9': {
 				std::ofstream file;
-				//time_t t = time(0);
+				//time_t t = time(0); //if we need many we can turn on the timestamp based file saving, but it makes choosing difficult
 				//std::stringstream ss;
 				//ss << t;
 				//std::string filename = ss.str();
-				std::string filename = "test";
+				std::string filename = "savedpos";
 				filename.append(".txt");
 				file.open(filename);
 				std::cout << filename << std::endl;
@@ -154,20 +158,28 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 					  }
 					  return true;
 			case '0': {
-				std::ofstream file;
-				std::string filename = "test";
-				filename.append(".txt");
-				file.open(filename);
-				std::cout << filename << std::endl;
+				std::string line;
+				std::ifstream file ("savedpos.txt");
 
-				
+				double newAngles [6];
 
-				for (int i = 0; i < 6; i++) {
-					file << g_pRotatorData->configs[i]->rotateAngle << ",";
+				if (file.is_open())	{
+					while (getline(file, line)) {
+						std::string input = line;
+						std::istringstream ss(input);
+						std::string token;
+
+						int i = 0;
+						while (std::getline(ss, token, ',')) {
+							newAngles[i] = atof(token.c_str());
+							i++;
+						}
+					}
+					file.close();
 				}
-
-				file << "";
-				file.close();
+				for (int i = 0; i < 6; i++) {
+					g_pRotatorData->animate(newAngles[i], g_pRotatorData->configs[i]);
+				}
 					  }
 					  return true;
 			}

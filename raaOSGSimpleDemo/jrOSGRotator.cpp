@@ -26,8 +26,18 @@ void jrOSGRotator::rotate(osg::Node* node, const std::string name, const double 
 }
 
 void jrOSGRotator::rotate(osg::Node* node, double angle, osg::Vec3d axis) {
+	osg::MatrixTransform* matrixTrans = dynamic_cast<osg::MatrixTransform*>(node);
 
-	osg::MatrixTransform* transform = dynamic_cast<osg::MatrixTransform*>(node);
-	transform->setMatrix(osg::Matrix::rotate(angle, axis));
+	osg::Group* parent = node->getParent(0);
 
+	osg::Vec3d trans = dynamic_cast<osg::MatrixTransform*>(parent)->getMatrix().getTrans();
+	trans.x() *= -1;
+	trans.y() *= -1;
+	trans.z() *= -1;
+
+
+
+	osg::Matrix matrix = osg::Matrix::translate(trans) * osg::Matrix::rotate(angle, axis);
+
+	matrixTrans->setMatrix(matrix);
 }
