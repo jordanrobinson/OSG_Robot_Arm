@@ -2,6 +2,7 @@
 
 #include <osgViewer/Viewer>
 #include <osg/StateSet>
+#include <osgDB/WriteFile>
 
 #include <Windows.h>
 
@@ -182,7 +183,14 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 				}
 					  }
 					  return true;
+			case '/': {
+				osgDB::writeNodeFile(*(g_pRoot->getParent(0)), "mech.osgb");
+					  }
+					  return true;
+
 			}
+
+
 		}
 		else if (pViewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYUP) {
 			switch(ea.getKey()) {

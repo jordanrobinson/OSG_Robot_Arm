@@ -8,8 +8,9 @@ jrOSGRotatorConfig::jrOSGRotatorConfig() {
 	rotateLeft = false;
 	rotateRight = false;
 	rotateAngle = 0;
-	minAngle = -0.7;
-	maxAngle = 0.7;
+	rotateSpeed = 0.01;
+	minAngle = -0.705;
+	maxAngle = 0.705;
 	newAngle = 0;
 	undoAnimateAngle = 0;
 	axis = osg::Vec3d(1, 0, 0);

@@ -13,6 +13,7 @@ public:
 	bool rotateLeft;
 	bool rotateRight;
 	double rotateAngle;
+	double rotateSpeed;
 	double minAngle;
 	double maxAngle;
 	double newAngle;

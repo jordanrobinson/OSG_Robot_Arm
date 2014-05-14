@@ -21,6 +21,7 @@ jrOSGRotatorDataType::jrOSGRotatorDataType(osg::Node* node) {
 
 
 	bodyConfig->axis = osg::Vec3d(0, 0, 1);
+	bodyConfig->rotateSpeed = 0.02;
 	hand2Config->axis = osg::Vec3d(0, 0, 1);
 	hand3Config->axis = osg::Vec3d(0, 1, 0);
 	hand3Config->maxAngle = 1.7;
@@ -92,7 +93,7 @@ void jrOSGRotatorDataType::updateRotation() {
 
 		if (configs[i]->rotateLeft || configs[i]->rotateRight) {
 			if (configs[i]->rotateLeft) {
-				configs[i]->rotateAngle += 0.005;
+				configs[i]->rotateAngle += configs[i]->rotateSpeed;
 				rotator.rotate(configs[i]->rotator, configs[i]->rotateAngle, configs[i]->axis);
 			}
 			if (configs[i]->rotateAngle > 0.705) {
@@ -104,7 +105,7 @@ void jrOSGRotatorDataType::updateRotation() {
 				configs[i]->rotateLeft = true;
 			}
 			if (configs[i]->rotateRight) {
-				configs[i]->rotateAngle -= 0.005;
+				configs[i]->rotateAngle -= configs[i]->rotateSpeed;
 				rotator.rotate(configs[i]->rotator, configs[i]->rotateAngle, configs[i]->axis);
 			}
 			configs[i]->rotateLeft = false;

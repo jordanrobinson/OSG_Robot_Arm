@@ -1,5 +1,4 @@
 // raaOSGSimpleDemo.cpp : Defines the entry point for the console application.
-//
 
 #include "stdafx.h"
 
@@ -23,6 +22,7 @@
 #include "jrOSGNodeFinder.h"
 #include "jrOSGRotatorDataType.h"
 #include "jrOSGRotateCallback.h"
+#include "jrOSGPickHandler.h"
 
 const static float csg_AmbCoef = 0.1f;
 const static float csg_DiffCoef = 0.8f;
@@ -254,7 +254,8 @@ int main(int argc, char* argv[]) {
 
 	// RAA::Exercise 3 
 	// add custom handler -> press 'i' for info, 'p' for rendering modes
-	viewer.addEventHandler(new raaOSGSimpleEventHandler(&viewer)); 
+	viewer.addEventHandler(new raaOSGSimpleEventHandler(&viewer));
+	viewer.addEventHandler(new jrOSGPickHandler(&viewer));
 
 	return viewer.run();
 }
