@@ -2,6 +2,7 @@
 
 #include <osgViewer/Viewer>
 #include <osg/StateSet>
+#include <osg/Matrixd>
 #include <osgDB/WriteFile>
 
 #include <Windows.h>
@@ -18,17 +19,27 @@
 #include "jrOSGSwitchSetup.h"
 #include "jrOSGRotatorDataType.h"
 
-double rotateAngle;
-osg::Node *g_pRoot = 0;
-osg::ref_ptr<jrOSGRotatorDataType> g_pRotatorData = 0;
+osg::Node *bodyRotateNode = 0;
+osg::Node *rootNode = 0;
+osg::ref_ptr<jrOSGRotatorDataType> rotatorData = 0;
+
+osg::Matrixd *savedProjectionMatrix = 0;
 
 raaOSGSimpleEventHandler::raaOSGSimpleEventHandler(osgViewer::Viewer* pViewer) {
 	m_mMode = osg::PolygonMode::FILL;
-	if (!g_pRoot) {
+	if (!bodyRotateNode) {
 		jrOSGNodeFinder finder("Body_Rotator");
 		finder.traverse(*(pViewer->getScene()->getSceneData()));
-		g_pRoot = finder.getNode();
-		g_pRotatorData = dynamic_cast<jrOSGRotatorDataType*> (g_pRoot->getUserData());
+		bodyRotateNode = finder.getNode();
+		rotatorData = dynamic_cast<jrOSGRotatorDataType*> (bodyRotateNode->getUserData());
+		rotatorData->ref();
+		bodyRotateNode->ref();
+	}
+	if (!rootNode) {
+		jrOSGNodeFinder rootFinder("Robot_Locator");
+		rootFinder.traverse(*(pViewer->getScene()->getSceneData()));
+		rootNode = rootFinder.getNode();
+		rootNode->ref();
 	}
 }
 
@@ -42,51 +53,51 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 		if(pViewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN) {
 			switch(ea.getKey()) {
 			case 'b': {
-				g_pRotatorData->hand3Config->rotateLeft = true;
+				rotatorData->hand3Config->rotateLeft = true;
 					  }
 					  return true;
 			case 'B': {
-				g_pRotatorData->hand3Config->rotateRight = true;
+				rotatorData->hand3Config->rotateRight = true;
 					  }
 					  return true;
 			case 'u': {
-				g_pRotatorData->hand2Config->rotateLeft = true;
+				rotatorData->hand2Config->rotateLeft = true;
 					  }
 					  return true;
 			case 'U': {
-				g_pRotatorData->hand2Config->rotateRight = true;
+				rotatorData->hand2Config->rotateRight = true;
 					  }
 					  return true;
 			case 'l': {
-				g_pRotatorData->hand1Config->rotateLeft = true;
+				rotatorData->hand1Config->rotateLeft = true;
 					  }
 					  return true;
 			case 'L': {
-				g_pRotatorData->hand1Config->rotateRight = true;
+				rotatorData->hand1Config->rotateRight = true;
 					  }
 					  return true;
 			case 'o': {
-				g_pRotatorData->upperArmConfig->rotateLeft = true;
+				rotatorData->upperArmConfig->rotateLeft = true;
 					  }
 					  return true;
 			case 'O': {
-				g_pRotatorData->upperArmConfig->rotateRight = true;
+				rotatorData->upperArmConfig->rotateRight = true;
 					  }
 					  return true;
 			case 'j': {
-				g_pRotatorData->lowerArmConfig->rotateLeft = true;
+				rotatorData->lowerArmConfig->rotateLeft = true;
 					  }
 					  return true;
 			case 'J': {
-				g_pRotatorData->lowerArmConfig->rotateRight = true;
+				rotatorData->lowerArmConfig->rotateRight = true;
 					  }
 					  return true;
 			case 'k': {
-				g_pRotatorData->bodyConfig->rotateLeft = true;
+				rotatorData->bodyConfig->rotateLeft = true;
 					  }
 					  return true;
 			case 'K': {
-				g_pRotatorData->bodyConfig->rotateRight = true;
+				rotatorData->bodyConfig->rotateRight = true;
 					  }
 					  return true;
 			case 'i':
@@ -103,35 +114,35 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 					osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 				return true;
 			case '4': {
-				g_pRotatorData->animate(0, g_pRotatorData->bodyConfig);
-				g_pRotatorData->animate(0, g_pRotatorData->upperArmConfig);
-				g_pRotatorData->animate(0, g_pRotatorData->lowerArmConfig);
+				rotatorData->animate(0, rotatorData->bodyConfig);
+				rotatorData->animate(0, rotatorData->upperArmConfig);
+				rotatorData->animate(0, rotatorData->lowerArmConfig);
 					  }
 					  return true;
 			case '5': {
-				g_pRotatorData->animate(0.5, g_pRotatorData->bodyConfig);
-				g_pRotatorData->animate(-0.6, g_pRotatorData->upperArmConfig);
-				g_pRotatorData->animate(0.3, g_pRotatorData->lowerArmConfig);
-				g_pRotatorData->animate(-0.7, g_pRotatorData->hand1Config);
-				g_pRotatorData->animate(0.7, g_pRotatorData->hand2Config);
-				g_pRotatorData->animate(-0.7, g_pRotatorData->hand3Config);
+				rotatorData->animate(0.5, rotatorData->bodyConfig);
+				rotatorData->animate(-0.6, rotatorData->upperArmConfig);
+				rotatorData->animate(0.3, rotatorData->lowerArmConfig);
+				rotatorData->animate(-0.7, rotatorData->hand1Config);
+				rotatorData->animate(0.7, rotatorData->hand2Config);
+				rotatorData->animate(-0.7, rotatorData->hand3Config);
 					  }
 					  return true;
 			case '6': {
 				for (int i = 0; i < 6; i++) {
-					g_pRotatorData->recordedAnimateCoords[i] = g_pRotatorData->configs[i]->rotateAngle;
+					rotatorData->recordedAnimateCoords[i] = rotatorData->configs[i]->rotateAngle;
 				}
 					  }
 					  return true;
 			case '7': {
 				for (int i = 0; i < 6; i++) {
-					g_pRotatorData->animate(g_pRotatorData->recordedAnimateCoords[i], g_pRotatorData->configs[i]);
+					rotatorData->animate(rotatorData->recordedAnimateCoords[i], rotatorData->configs[i]);
 				}
 					  }
 					  return true;
 			case '8': {
 				for (int i = 0; i < 6; i++) {
-					g_pRotatorData->animate(g_pRotatorData->configs[i]->undoAnimateAngle, g_pRotatorData->configs[i]);
+					rotatorData->animate(rotatorData->configs[i]->undoAnimateAngle, rotatorData->configs[i]);
 				}
 					  }
 					  return true;
@@ -148,7 +159,7 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 				std::cout << filename << std::endl;
 
 				for (int i = 0; i < 6; i++) {
-					file << g_pRotatorData->configs[i]->rotateAngle << ",";
+					file << rotatorData->configs[i]->rotateAngle << ",";
 				}
 
 				file << "";
@@ -176,12 +187,28 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 					file.close();
 				}
 				for (int i = 0; i < 6; i++) {
-					g_pRotatorData->animate(newAngles[i], g_pRotatorData->configs[i]);
+					rotatorData->animate(newAngles[i], rotatorData->configs[i]);
 				}
 					  }
 					  return true;
 			case '/': {
-				osgDB::writeNodeFile(*(g_pRoot->getParent(0)), "mech.osgb");
+				osgDB::writeNodeFile(*(rootNode), "jrRobot.osg");
+					  }
+					  return true;
+
+			case '`': {
+
+				//pViewer->getCameraManipulator()->
+
+				//if (savedProjectionMatrix) {
+				//	pViewer->getCamera()->setProjectionMatrix(*savedProjectionMatrix);
+				//}
+
+				//savedProjectionMatrix = &(pViewer->getCamera()->getProjectionMatrix());
+
+
+				//pViewer->getCamera()->setProjectionMatrixAsPerspective(45.0, 1.0, 0.5, 1000);
+				//pViewer->getCamera()->setViewMatrix(osg::Matrix::lookAt(osg::Vec3(0, 0, 200), osg::Vec3(0, 0, 0), osg::Vec3(0, 1, 0)));
 					  }
 					  return true;
 			}
@@ -201,12 +228,12 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 			case 'K':
 			case '#':
 			case '~': {
-				g_pRotatorData->hand1Config->osgSwitch->setSingleChildOn(0);
-				g_pRotatorData->hand2Config->osgSwitch->setSingleChildOn(0);
-				g_pRotatorData->hand3Config->osgSwitch->setSingleChildOn(0);
-				g_pRotatorData->upperArmConfig->osgSwitch->setSingleChildOn(0);
-				g_pRotatorData->lowerArmConfig->osgSwitch->setSingleChildOn(0);
-				g_pRotatorData->bodyConfig->osgSwitch->setSingleChildOn(0);
+				rotatorData->hand1Config->osgSwitch->setSingleChildOn(0);
+				rotatorData->hand2Config->osgSwitch->setSingleChildOn(0);
+				rotatorData->hand3Config->osgSwitch->setSingleChildOn(0);
+				rotatorData->upperArmConfig->osgSwitch->setSingleChildOn(0);
+				rotatorData->lowerArmConfig->osgSwitch->setSingleChildOn(0);
+				rotatorData->bodyConfig->osgSwitch->setSingleChildOn(0);
 					  }
 					  return true;
 			}

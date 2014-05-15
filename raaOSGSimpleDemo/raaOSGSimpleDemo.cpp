@@ -37,7 +37,13 @@ int main(int argc, char* argv[]) {
 	g_pRoot->ref();
 
 	// load model
-	g_pRoot->addChild(osgDB::readNodeFiles(arguments));
+	if (osgDB::readNodeFiles(arguments)) {
+		g_pRoot->addChild(osgDB::readNodeFiles(arguments));
+	}
+	else {
+		std::cout << "Can't find valid osg file, so exiting.";
+		return 1;
+	}
 
 	// setup viewer
 	osgViewer::Viewer viewer;

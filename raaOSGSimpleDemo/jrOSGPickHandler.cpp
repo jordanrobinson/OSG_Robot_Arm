@@ -28,9 +28,29 @@ bool jrOSGPickHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::GUIAction
 					  return true;
 			case '~': {
 				selectedRotator->rotateLeft = true;
+
+				//if(g_KeyswitchManipulator.valid()) {
+				//	viewer->setCameraManipulator( g_KeyswitchManipulator, false );
+				//	g_KeyswitchManipulator.release();
+				//} else {
+				//	g_KeyswitchManipulator = dynamic_cast<osgGA::KeySwitchMatrixManipulator*>(viewer->getCameraManipulator());
+					viewer->setCameraManipulator(nullptr, false);
+				//}
 					  }
 					  return true;
 			}
+		}
+
+
+
+
+
+		if(viewer && selectedRotator && ea.getEventType() == 16) {
+			std::cout << "bingo" << std::endl;
+			selectedRotator->rotateLeft = true;
+		}
+		else {
+			std::cout << ea.getEventType() << std::endl;
 		}
 
 		switch(ea.getEventType()) {
@@ -46,7 +66,7 @@ bool jrOSGPickHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::GUIAction
 					hitr != intersections.end(); ++hitr) {
 						if (!hitr->nodePath.empty() && !(hitr->nodePath.back()->getName().empty())) {
 							// the geodes are identified by name.
-							os << "Object \"" << hitr->nodePath.back()->getName() << "\""<< std::endl;
+							os << "Object \"" << hitr->nodePath.back()->getName() << "\"" << std::endl;
 							if (hitr->nodePath.back()->getName().find("Hand3") != std::string::npos) {
 								selectedRotator = g_pRotatorData->hand3Config;
 								return true;

@@ -9,7 +9,9 @@
 
 jrOSGRotateCallback::jrOSGRotateCallback(void) {}
 
-jrOSGRotateCallback::~jrOSGRotateCallback(void) {}
+jrOSGRotateCallback::~jrOSGRotateCallback(void) {
+	unref();
+}
 
 void jrOSGRotateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv) {
 	osg::ref_ptr<jrOSGRotatorDataType> rotatorData = dynamic_cast<jrOSGRotatorDataType*> (node->getUserData());
