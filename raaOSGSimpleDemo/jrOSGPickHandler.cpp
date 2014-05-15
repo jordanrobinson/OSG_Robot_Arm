@@ -16,7 +16,9 @@ jrOSGPickHandler::jrOSGPickHandler(osgViewer::Viewer* view) {
 	g_pRotatorData = dynamic_cast<jrOSGRotatorDataType*> (finder.getNode()->getUserData());
 }
 
-jrOSGPickHandler::~jrOSGPickHandler(void) {}
+jrOSGPickHandler::~jrOSGPickHandler(void) {
+	unref();
+}
 
 bool jrOSGPickHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::GUIActionAdapter &aa,
 	osg::Object *, osg::NodeVisitor *) {
@@ -34,23 +36,28 @@ bool jrOSGPickHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::GUIAction
 				//	g_KeyswitchManipulator.release();
 				//} else {
 				//	g_KeyswitchManipulator = dynamic_cast<osgGA::KeySwitchMatrixManipulator*>(viewer->getCameraManipulator());
-					viewer->setCameraManipulator(nullptr, false);
+				viewer->setCameraManipulator(nullptr, false);
+				//}
+					  }
+					  return true;
+			case 'a': {
+
+
+
+
+
+				//selectedRotator->rotateLeft = true;
+
+				//if(g_KeyswitchManipulator.valid()) {
+				//	viewer->setCameraManipulator( g_KeyswitchManipulator, false );
+				//	g_KeyswitchManipulator.release();
+				//} else {
+				//	g_KeyswitchManipulator = dynamic_cast<osgGA::KeySwitchMatrixManipulator*>(viewer->getCameraManipulator());
+				//viewer->setCameraManipulator(nullptr, false);
 				//}
 					  }
 					  return true;
 			}
-		}
-
-
-
-
-
-		if(viewer && selectedRotator && ea.getEventType() == 16) {
-			std::cout << "bingo" << std::endl;
-			selectedRotator->rotateLeft = true;
-		}
-		else {
-			std::cout << ea.getEventType() << std::endl;
 		}
 
 		switch(ea.getEventType()) {

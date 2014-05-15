@@ -5,6 +5,15 @@
 #include <osg/Matrixd>
 #include <osgDB/WriteFile>
 
+#include <osgManipulator/TabBoxDragger>
+#include <osgManipulator/TabBoxTrackballDragger>
+#include <osgManipulator/TabPlaneDragger>
+#include <osgManipulator/TabPlaneTrackballDragger>
+#include <osgManipulator/TrackballDragger>
+#include <osgManipulator/Translate1DDragger>
+#include <osgManipulator/Translate2DDragger>
+#include <osgManipulator/TranslateAxisDragger>
+
 #include <Windows.h>
 
 #include <iostream>
@@ -197,20 +206,36 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 					  return true;
 
 			case '`': {
+				//scene->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
 
-				//pViewer->getCameraManipulator()->
+				//osg::MatrixTransform* selection = new osg::MatrixTransform;
+				//selection->addChild(scene);
 
-				//if (savedProjectionMatrix) {
-				//	pViewer->getCamera()->setProjectionMatrix(*savedProjectionMatrix);
-				//}
+				osgManipulator::TabPlaneDragger* d = new osgManipulator::TabPlaneDragger();
+				d->setupDefaultGeometry();
 
-				//savedProjectionMatrix = &(pViewer->getCamera()->getProjectionMatrix());
+				rotatorData->bodyConfig->osgSwitch->addChild(d);
 
+				float scale = 40;
+				d->setMatrix(osg::Matrix::scale(scale, scale, scale) *
+					osg::Matrix::translate(rootNode->getBound().center()));
 
-				//pViewer->getCamera()->setProjectionMatrixAsPerspective(45.0, 1.0, 0.5, 1000);
-				//pViewer->getCamera()->setViewMatrix(osg::Matrix::lookAt(osg::Vec3(0, 0, 200), osg::Vec3(0, 0, 0), osg::Vec3(0, 1, 0)));
+				d->addTransformUpdating(dynamic_cast<osg::MatrixTransform*>(rotatorData->bodyConfig->rotator));
+				// we want the dragger to handle it's own events automatically
+				d->setHandleEvents(true);
+
+				// if we don't set an activation key or mod mask then any mouse click on
+				// the dragger will activate it, however if do define either of ActivationModKeyMask or
+				// and ActivationKeyEvent then you'll have to press either than mod key or the specified key to
+				// be able to activate the dragger when you mouse click on it.  Please note the follow allows
+				// activation if either the ctrl key or the 'a' key is pressed and held down.
+				d->setActivationModKeyMask(osgGA::GUIEventAdapter::MODKEY_CTRL);
+				d->setActivationKeyEvent('a');
 					  }
 					  return true;
+
+
+
 			}
 		} else if (pViewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYUP) {
 			switch(ea.getKey()) {
