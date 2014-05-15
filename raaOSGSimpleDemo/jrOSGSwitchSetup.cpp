@@ -14,7 +14,6 @@ jrOSGSwitchSetup::~jrOSGSwitchSetup(void) {
 }
 
 osg::Switch* jrOSGSwitchSetup::addSwitch(osg::Group* group) {
-
 	osg::Switch* osgSwitch = new osg::Switch;
 	osgFX::Scribe* osgSwitchOn = new osgFX::Scribe;
 	osgFX::Scribe* osgSwitchError = new osgFX::Scribe;
@@ -24,7 +23,7 @@ osg::Switch* jrOSGSwitchSetup::addSwitch(osg::Group* group) {
 	osgSwitch->addChild(osgSwitchOn);
 	osgSwitch->addChild(osgSwitchError);
 
-	for (int i = 0; i < group->getNumChildren(); i++) {
+	for (unsigned int i = 0; i < group->getNumChildren(); i++) {
 		if (group->getChild(i)->asGeode()) {
 			osgSwitchOn->addChild(group->getChild(i));
 			osgSwitchOff->addChild(group->getChild(i));
@@ -33,7 +32,7 @@ osg::Switch* jrOSGSwitchSetup::addSwitch(osg::Group* group) {
 	}
 
 	group->addChild(osgSwitch);
-	for (int i = 0; i < osgSwitchOn->getNumChildren(); i++) {
+	for (unsigned int i = 0; i < osgSwitchOn->getNumChildren(); i++) {
 		group->removeChild(osgSwitchOn->getChild(i));
 	}
 
@@ -41,13 +40,13 @@ osg::Switch* jrOSGSwitchSetup::addSwitch(osg::Group* group) {
 	scribeName.append(group->getName());
 
 	osgSwitchOn->setName(scribeName);
-	osgSwitchOn->setWireframeColor(osg::Vec4(0,0.8,0,0.5));
+	osgSwitchOn->setWireframeColor(osg::Vec4(0, 0.8, 0, 0.5));
 
 	std::string errorName("Error_Highlight_");
 	errorName.append(group->getName());
 
 	osgSwitchError->setName(scribeName);
-	osgSwitchError->setWireframeColor(osg::Vec4(0.8,0,0,0.5));
+	osgSwitchError->setWireframeColor(osg::Vec4(0.8, 0, 0, 0.5));
 
 	std::string switchName("Switch_");
 	switchName.append(group->getName());
@@ -59,5 +58,4 @@ osg::Switch* jrOSGSwitchSetup::addSwitch(osg::Group* group) {
 
 	osgSwitch->setSingleChildOn(0);
 	return osgSwitch;
-
 }

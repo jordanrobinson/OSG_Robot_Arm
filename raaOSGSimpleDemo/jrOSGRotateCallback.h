@@ -8,14 +8,7 @@
 class jrOSGRotateCallback: public osg::NodeCallback {
 public:
 
-	virtual void operator()(osg::Node* node, osg::NodeVisitor* nv) {
-		osg::ref_ptr<jrOSGRotatorDataType> rotatorData = dynamic_cast<jrOSGRotatorDataType*> (node->getUserData());
-
-		if (rotatorData) {
-			rotatorData->updateRotation();
-		}
-		traverse(node, nv);
-	}
+	virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
 	
 	jrOSGRotateCallback(void);
 	virtual ~jrOSGRotateCallback(void);

@@ -16,7 +16,15 @@ void raaOSGPrintVisitor::apply(osg::Node &node) {
 		std::cout << "|--";
 	}
 
-	std::cout << node.className() << " Name: " << node.getName() << " Lib: " << node.libraryName() << " Parents: " << node.getNumParents() << std::endl;
+	std::cout
+		<< node.className()
+		<< " Name: "
+		<< node.getName()
+		<< " Lib: "
+		<< node.libraryName()
+		<< " Parents: "
+		<< node.getNumParents()
+		<< std::endl;
 
 	traverse(node);
 }

@@ -5,15 +5,12 @@
 #include <osg/MatrixTransform>
 #include "jrOSGRotator.h"
 
-jrOSGRotator::jrOSGRotator(void) {
-}
+jrOSGRotator::jrOSGRotator(void) {}
 
 
-jrOSGRotator::~jrOSGRotator(void) {
-}
+jrOSGRotator::~jrOSGRotator(void) {}
 
 void jrOSGRotator::rotate(osg::Node* node, const std::string name, const double angle) {
-
 	osg::Group* parent = node->getParent(0);
 
 	osg::MatrixTransform* transform = new osg::MatrixTransform;

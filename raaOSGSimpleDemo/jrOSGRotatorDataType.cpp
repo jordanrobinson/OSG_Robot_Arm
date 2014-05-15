@@ -6,19 +6,16 @@
 #include <osg/Vec3d>
 #include "jrOSGRotatorDataType.h"
 #include "jrOSGRotator.h"
-#include "jrOSGHighlighter.h"
 #include "jrOSGSwitchSetup.h"
 #include "jrOSGRotatorConfig.h"
 
 jrOSGRotatorDataType::jrOSGRotatorDataType(osg::Node* node) {
-
 	bodyConfig = new jrOSGRotatorConfig();
 	upperArmConfig = new jrOSGRotatorConfig();
 	lowerArmConfig = new jrOSGRotatorConfig();
 	hand1Config = new jrOSGRotatorConfig();
 	hand2Config = new jrOSGRotatorConfig();
 	hand3Config = new jrOSGRotatorConfig();
-
 
 	bodyConfig->axis = osg::Vec3d(0, 0, 1);
 	bodyConfig->rotateSpeed = 0.02;
@@ -77,12 +74,10 @@ jrOSGRotatorDataType::jrOSGRotatorDataType(osg::Node* node) {
 
 }
 
-
 jrOSGRotatorDataType::~jrOSGRotatorDataType(void) {
 }
 
 void jrOSGRotatorDataType::updateRotation() {
-
 	jrOSGRotator rotator;
 
 	for (int i = 0; i < 6; i++) {
@@ -96,11 +91,11 @@ void jrOSGRotatorDataType::updateRotation() {
 				configs[i]->rotateAngle += configs[i]->rotateSpeed;
 				rotator.rotate(configs[i]->rotator, configs[i]->rotateAngle, configs[i]->axis);
 			}
-			if (configs[i]->rotateAngle > 0.705) {
+			if (configs[i]->rotateAngle >= configs[i]->maxAngle) {
 				configs[i]->rotateRight = true;
 				configs[i]->rotateLeft = false;
 			}
-			if (configs[i]->rotateAngle < -0.705) {
+			if (configs[i]->rotateAngle <= configs[i]->minAngle) {
 				configs[i]->rotateRight = false;
 				configs[i]->rotateLeft = true;
 			}
@@ -115,25 +110,20 @@ void jrOSGRotatorDataType::updateRotation() {
 }
 
 void jrOSGRotatorDataType::highlight(jrOSGRotatorConfig* config) {
-
 	if (config->rotateLeft || config->rotateRight) {
-		if (config->rotateAngle > config->maxAngle || config->rotateAngle < config->minAngle) {
-			config->osgSwitch->setSingleChildOn(2);
-			std::cout << " rotateAngle: " << config->rotateAngle << " max: " << config->maxAngle << std::endl;
-		}
-		else {
-
-			config->osgSwitch->setSingleChildOn(1);
+		if (config->rotateAngle >= (config->maxAngle - (config->rotateSpeed * 1)) 
+			|| config->rotateAngle <= (config->minAngle + (config->rotateSpeed * 1))) {
+			config->osgSwitch->setSingleChildOn(2); // error state
+		} else {
+			config->osgSwitch->setSingleChildOn(1); // activated state
 		}
 	}
 }
 
 void jrOSGRotatorDataType::animate(double newAngle, jrOSGRotatorConfig* config) {
-
 	if (config->newAngle == newAngle) {
 		animate(config);
-	}
-	else {
+	} else {
 		config->undoAnimateAngle = config->rotateAngle;
 		config->newAngle = newAngle;
 		animate(config);
@@ -145,12 +135,10 @@ void jrOSGRotatorDataType::animate(jrOSGRotatorConfig* config) {
 		config->animating = true;
 		if (config->newAngle > config->rotateAngle) {
 			config->rotateLeft = true;
-		}
-		else if (config->newAngle < config->rotateAngle) {
+		} else if (config->newAngle < config->rotateAngle) {
 			config->rotateRight = true;
 		}
-	}
-	else {
+	} else {
 		config->animating = false;
 		config->osgSwitch->setSingleChildOn(0);
 	}

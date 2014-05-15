@@ -30,117 +30,6 @@ const static float csg_SpecCoef = 1.0f;
 
 osg::Group *g_pRoot = 0;
 
-osg::Node* makeLitSphere(float fDim, float *afCol) {
-	osg::Node *pNode = 0;
-	if(afCol) {
-		osg::Geode *pGeode = new osg::Geode();
-		osg::ShapeDrawable *pGeom = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3f(0.0f, 0.0f, 0.0f), fDim));
-		pGeode->addDrawable(pGeom);
-
-		osg::Material *pMat = new osg::Material();
-
-		pMat->setAmbient(osg::Material::FRONT, osg::Vec4(afCol[0]*csg_AmbCoef,
-			afCol[1]*csg_AmbCoef, afCol[2]*csg_AmbCoef, afCol[0]));
-		pMat->setDiffuse(osg::Material::FRONT, osg::Vec4(afCol[0]*csg_DiffCoef,
-			afCol[1]*csg_DiffCoef, afCol[2]*csg_DiffCoef, afCol[0]));
-		pMat->setSpecular(osg::Material::FRONT, osg::Vec4(afCol[0]*csg_SpecCoef,
-			afCol[1]*csg_SpecCoef, afCol[2]*csg_SpecCoef, afCol[0]));
-		pMat->setShininess(osg::Material::FRONT, 2.0f);
-
-		pGeode->getOrCreateStateSet()->setAttributeAndModes(pMat, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
-		pGeom->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
-
-		pNode = pGeode;
-	}
-
-	return pNode;
-}
-
-osg::Node* makeBox(float fDim) {
-	// make a vertex based shape
-	osg::Geode *pGeode = new osg::Geode();
-	osg::Geometry *pGeom = new osg::Geometry();
-
-	pGeode->addDrawable(pGeom);
-
-	pGeom->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
-
-	float fHalfDim = fDim*0.5f;
-
-	osg::Vec3Array *pVerts = new osg::Vec3Array();
-	pVerts->push_back(osg::Vec3(-fHalfDim, -fHalfDim, -fHalfDim));
-	pVerts->push_back(osg::Vec3(-fHalfDim, fHalfDim, -fHalfDim));
-	pVerts->push_back(osg::Vec3(fHalfDim, fHalfDim, -fHalfDim));
-	pVerts->push_back(osg::Vec3(fHalfDim, -fHalfDim, -fHalfDim));
-
-	pVerts->push_back(osg::Vec3(-fHalfDim, -fHalfDim, fHalfDim));
-	pVerts->push_back(osg::Vec3(fHalfDim, -fHalfDim, fHalfDim));
-	pVerts->push_back(osg::Vec3(fHalfDim, fHalfDim, fHalfDim));
-	pVerts->push_back(osg::Vec3(-fHalfDim, fHalfDim, fHalfDim));
-
-	pGeom->setVertexArray(pVerts);
-
-	osg::DrawElementsUByte *pIndex = new osg::DrawElementsUByte(osg::PrimitiveSet::QUADS, 4);
-
-	pIndex->push_back(0);
-	pIndex->push_back(1);
-	pIndex->push_back(2);
-	pIndex->push_back(3);
-
-	pIndex->push_back(0);
-	pIndex->push_back(3);
-	pIndex->push_back(5);
-	pIndex->push_back(4);
-
-	pIndex->push_back(3);
-	pIndex->push_back(2);
-	pIndex->push_back(6);
-	pIndex->push_back(5);
-
-	pIndex->push_back(2);
-	pIndex->push_back(1);
-	pIndex->push_back(7);
-	pIndex->push_back(6);
-
-	pIndex->push_back(1);
-	pIndex->push_back(0);
-	pIndex->push_back(4);
-	pIndex->push_back(7);
-
-	pIndex->push_back(4);
-	pIndex->push_back(5);
-	pIndex->push_back(6);
-	pIndex->push_back(7);
-
-	pGeom->addPrimitiveSet(pIndex);
-
-	osg::Vec3Array *pNorms = new osg::Vec3Array();
-	pNorms->push_back(osg::Vec3(0.0f, 0.0f, -1.0f));
-	pNorms->push_back(osg::Vec3(0.0f, -1.0f, 0.0f));
-	pNorms->push_back(osg::Vec3(1.0f, 0.0f, 0.0f));
-	pNorms->push_back(osg::Vec3(0.0f, 1.0f, 0.0f));
-	pNorms->push_back(osg::Vec3(-1.0f, 0.0f, 0.0f));
-	pNorms->push_back(osg::Vec3(0.0f, 0.0f, 1.0f));
-
-	pGeom->setNormalArray(pNorms);
-	pGeom->setNormalBinding(osg::Geometry::BIND_PER_PRIMITIVE);
-
-	osg::Vec4Array *pCols = new osg::Vec4Array();
-	pCols->push_back(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	pCols->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
-	pCols->push_back(osg::Vec4(0.0f, 0.0f, 1.0f, 1.0f));
-	pCols->push_back(osg::Vec4(1.0f, 1.0f, 0.0f, 1.0f));
-	pCols->push_back(osg::Vec4(1.0f, 0.0f, 1.0f, 1.0f));
-	pCols->push_back(osg::Vec4(0.0f, 1.0f, 1.0f, 1.0f));
-	pCols->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	pCols->push_back(osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
-
-	pGeom->setColorArray(pCols);
-	pGeom->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
-
-	return pGeode;
-}
-
 int main(int argc, char* argv[]) {
 	osg::ArgumentParser arguments(&argc, argv);
 
@@ -150,26 +39,6 @@ int main(int argc, char* argv[]) {
 	// load model
 	g_pRoot->addChild(osgDB::readNodeFiles(arguments));
 
-	/* RAA::Exercise 2
-	// add unlit cube made from verts
-	osg::Matrixf m;
-	m.makeTranslate(10.0f, 0.0f, 0.0f);
-
-	osg::MatrixTransform *pMT0=new osg::MatrixTransform();
-	pMT0->setName("unlit_cube");
-	pMT0->addChild(makeBox(4.0f));
-	pMT0->setMatrix(m);
-	g_pRoot->addChild(pMT0);
-
-	// add lit sphere as shape
-	float afCol[]={1.0f, 0.0f, 0.0f, 1.0f};
-	m.makeTranslate(-10.0f, 0.0f, 0.0f);
-	osg::MatrixTransform *pMT1=new osg::MatrixTransform();
-	pMT1->setName("lit_sphere");
-	pMT1->addChild(makeLitSphere(4.0f, afCol));
-	pMT1->setMatrix(m);
-	g_pRoot->addChild(pMT1);
-	*/
 	// setup viewer
 	osgViewer::Viewer viewer;
 
@@ -221,7 +90,7 @@ int main(int argc, char* argv[]) {
 
 	viewer.realize();
 
-	//print out the nodes before run
+	// print out the nodes before run
 	raaOSGPrintVisitor printer;
 	printer.traverse(*(viewer.getScene()->getSceneData()));
 
@@ -232,28 +101,6 @@ int main(int argc, char* argv[]) {
 	finder.getNode()->setUserData(rotatorData);
 	finder.getNode()->setUpdateCallback(new jrOSGRotateCallback);
 
-	//Body_Rotator
-	//UpperArm_Rotator
-	//LowerArm_Rotator
-	//Hand1_Rotator
-	//Hand2_Rotator
-	//Hand3_Rotator
-
-	//jrOSGNodeFinder finder("Body_Rotator");
-	//finder.traverse(*(viewer.getScene()->getSceneData()));
-	//jrOSGSwitchSetup* setup = new jrOSGSwitchSetup;
-	//setup->addSwitch(finder.getNode());
-	//
-	//jrOSGNodeFinder lowerFinder("LowerArm_Rotator");
-	//lowerFinder.traverse(*(viewer.getScene()->getSceneData()));
-	//setup->addSwitch(lowerFinder.getNode());
-
-	//jrOSGNodeFinder upperFinder("UpperArm_Rotator");
-	//upperFinder.traverse(*(viewer.getScene()->getSceneData()));
-	//setup->addSwitch(upperFinder.getNode());
-
-	// RAA::Exercise 3 
-	// add custom handler -> press 'i' for info, 'p' for rendering modes
 	viewer.addEventHandler(new raaOSGSimpleEventHandler(&viewer));
 	viewer.addEventHandler(new jrOSGPickHandler(&viewer));
 
