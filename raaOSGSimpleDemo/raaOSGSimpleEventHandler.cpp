@@ -5,15 +5,6 @@
 #include <osg/Matrixd>
 #include <osgDB/WriteFile>
 
-#include <osgManipulator/TabBoxDragger>
-#include <osgManipulator/TabBoxTrackballDragger>
-#include <osgManipulator/TabPlaneDragger>
-#include <osgManipulator/TabPlaneTrackballDragger>
-#include <osgManipulator/TrackballDragger>
-#include <osgManipulator/Translate1DDragger>
-#include <osgManipulator/Translate2DDragger>
-#include <osgManipulator/TranslateAxisDragger>
-
 #include <Windows.h>
 
 #include <iostream>
@@ -31,8 +22,6 @@
 osg::Node *bodyRotateNode = 0;
 osg::Node *rootNode = 0;
 osg::ref_ptr<jrOSGRotatorDataType> rotatorData = 0;
-
-osg::Matrixd *savedProjectionMatrix = 0;
 
 osg::Vec3d eye;
 osg::Vec3d center;
@@ -60,7 +49,6 @@ raaOSGSimpleEventHandler::~raaOSGSimpleEventHandler(void) {
 	bodyRotateNode->unref();
 	rootNode->unref();
 	rotatorData->unref();
-	unref();
 }
 
 bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::GUIActionAdapter &aa,
@@ -215,29 +203,6 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 				osgDB::writeNodeFile(*(rootNode), "jrRobot.osg");
 					  }
 					  return true;
-
-			case '`': {
-				
-				if (savedProjectionMatrix) {
-					osg::Matrixd *tempMatrix = savedProjectionMatrix;
-					savedProjectionMatrix = &(viewer->getCameraManipulator()->getMatrix());
-					viewer->getCameraManipulator()->setByMatrix(*tempMatrix);
-				}
-				else {
-					savedProjectionMatrix = &(viewer->getCameraManipulator()->getMatrix());
-				}
-
-				viewer->getCameraManipulator();
-
-				//viewer->getCamera()->getViewMatrixAsLookAt(eye, center, up);
-
-
-
-					  }
-					  return true;
-
-
-
 			}
 		} else if (viewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYUP) {
 			switch(ea.getKey()) {

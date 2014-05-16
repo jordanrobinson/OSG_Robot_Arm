@@ -10,7 +10,6 @@
 jrOSGRotateCallback::jrOSGRotateCallback(void) {}
 
 jrOSGRotateCallback::~jrOSGRotateCallback(void) {
-	unref();
 }
 
 void jrOSGRotateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv) {

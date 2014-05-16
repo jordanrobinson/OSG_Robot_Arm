@@ -2,12 +2,10 @@
 
 #include "stdafx.h"
 
-#include <crtdbg.h>
-
 #include <osgDB/ReadFile>
 #include <osgViewer/Viewer>
 #include <osgGA/TrackballManipulator>
-#include <osgGA/FlightManipulator>
+#include <osgGA/TerrainManipulator>
 #include <osgGA/DriveManipulator>
 #include <osgGA/KeySwitchMatrixManipulator>
 #include <osgViewer/ViewerEventHandlers>
@@ -33,24 +31,27 @@ const static float csg_SpecCoef = 1.0f;
 osg::Group *g_pRoot = 0;
 
 int main(int argc, char* argv[]) {
-
-
 	osg::ArgumentParser arguments(&argc, argv);
 
 	g_pRoot = new osg::Group();
 	g_pRoot->ref();
 
 	// load model
-	osg::Node* readIn = osgDB::readNodeFiles(arguments);
-	readIn->ref();
+	if (arguments.argc() < 2) {
+		std::cout << "Need argument of file name to load." << std::endl;
+		return 1;
+	}
+
+	osg::ref_ptr<osg::Node> readIn = osgDB::readNodeFiles(arguments);
 
 	if (readIn) {
 		g_pRoot->addChild(readIn);
 	}
 	else {
-		std::cout << "Can't find valid osg file, so exiting.";
-		return 1;
+		std::cout << "Can't find valid osg file, so exiting." << std::endl;
+		return 2;
 	}
+	readIn->ref();
 
 	// setup viewer
 	osgViewer::Viewer viewer;
@@ -68,7 +69,7 @@ int main(int argc, char* argv[]) {
 
 	osgGA::KeySwitchMatrixManipulator* pKeyswitchManipulator = new osgGA::KeySwitchMatrixManipulator();
 	pKeyswitchManipulator->addMatrixManipulator( '1', "Trackball", new osgGA::TrackballManipulator() );
-	pKeyswitchManipulator->addMatrixManipulator( '2', "Flight", new osgGA::FlightManipulator() );
+	pKeyswitchManipulator->addMatrixManipulator( '2', "Terrain", new osgGA::TerrainManipulator() );
 	pKeyswitchManipulator->addMatrixManipulator( '3', "Drive", new osgGA::DriveManipulator() );
 	viewer.setCameraManipulator(pKeyswitchManipulator);
 
@@ -114,8 +115,13 @@ int main(int argc, char* argv[]) {
 	finder.getNode()->setUserData(rotatorData);
 	finder.getNode()->setUpdateCallback(new jrOSGRotateCallback);
 
-	viewer.addEventHandler(new raaOSGSimpleEventHandler(&viewer));
-	viewer.addEventHandler(new jrOSGPickHandler(&viewer));
+	raaOSGSimpleEventHandler* raaHandler = new raaOSGSimpleEventHandler(&viewer);
+	raaHandler->ref();
+	jrOSGPickHandler* jrHandler = new jrOSGPickHandler(&viewer);
+	jrHandler->ref();
+
+	viewer.addEventHandler(raaHandler);
+	viewer.addEventHandler(jrHandler);
 
 	while(!viewer.done()) {
 		viewer.frame(); 
@@ -123,6 +129,8 @@ int main(int argc, char* argv[]) {
 
 	g_pRoot->unref();
 	readIn->unref();
+	raaHandler->unref();
+	jrHandler->unref();
 
 	return viewer.run();
 

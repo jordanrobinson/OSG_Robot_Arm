@@ -4,6 +4,12 @@
 #include <iostream>
 #include <sstream>
 
+#include <osgGA/TrackballManipulator>
+#include <osgGA/TerrainManipulator>
+#include <osgGA/DriveManipulator>
+#include <osgGA/NodeTrackerManipulator>
+#include <osgGA/KeySwitchMatrixManipulator>
+
 #include "jrOSGPickHandler.h"
 #include "jrOSGRotatorConfig.h"
 #include "jrOSGRotatorDataType.h"
@@ -16,10 +22,20 @@ jrOSGPickHandler::jrOSGPickHandler(osgViewer::Viewer* view) {
 	g_pRotatorData = dynamic_cast<jrOSGRotatorDataType*> (finder.getNode()->getUserData());
 	lastXPosition = 0;
 	lastYPosition = 0;
+	
+	trackerManipulator = new osgGA::NodeTrackerManipulator;
+	osgGA::NodeTrackerManipulator::RotationMode rotationMode = osgGA::NodeTrackerManipulator::TRACKBALL;
+	osgGA::NodeTrackerManipulator::TrackerMode trackerMode = osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION;
+
+	trackerManipulator->setTrackerMode(trackerMode);
+	trackerManipulator->setRotationMode(rotationMode);
+
+	osgGA::KeySwitchMatrixManipulator* pKeyswitchManipulator = dynamic_cast<osgGA::KeySwitchMatrixManipulator*> (viewer->getCameraManipulator());
+	pKeyswitchManipulator->addMatrixManipulator('a', "Track", trackerManipulator);
+	viewer->setCameraManipulator(pKeyswitchManipulator);
 }
 
 jrOSGPickHandler::~jrOSGPickHandler(void) {
-	unref();
 }
 
 bool jrOSGPickHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::GUIActionAdapter &aa,
@@ -67,21 +83,27 @@ bool jrOSGPickHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::GUIAction
 							os << "Object \"" << hitr->nodePath.back()->getName() << "\"" << std::endl;
 							if (hitr->nodePath.back()->getName().find("Hand3") != std::string::npos) {
 								selectedRotator = g_pRotatorData->hand3Config;
+								trackerManipulator->setTrackNode(selectedRotator->rotator);
 								return true;
 							} else if (hitr->nodePath.back()->getName().find("Hand2") != std::string::npos) {
 								selectedRotator = g_pRotatorData->hand2Config;
+								trackerManipulator->setTrackNode(selectedRotator->rotator);
 								return true;
 							} else if (hitr->nodePath.back()->getName().find("Hand1") != std::string::npos) {
 								selectedRotator = g_pRotatorData->hand1Config;
+								trackerManipulator->setTrackNode(selectedRotator->rotator);
 								return true;
 							} else if (hitr->nodePath.back()->getName().find("ForeArm") != std::string::npos) {
 								selectedRotator = g_pRotatorData->lowerArmConfig;
+								trackerManipulator->setTrackNode(selectedRotator->rotator);
 								return true;
 							} else if (hitr->nodePath.back()->getName().find("BaseArm") != std::string::npos) {
 								selectedRotator = g_pRotatorData->upperArmConfig;
+								trackerManipulator->setTrackNode(selectedRotator->rotator);
 								return true;
 							} else if (hitr->nodePath.back()->getName().find("Base") != std::string::npos) {
 								selectedRotator = g_pRotatorData->bodyConfig;
+								trackerManipulator->setTrackNode(selectedRotator->rotator);
 								return true;
 							}
 						} else if (hitr->drawable.valid()) {

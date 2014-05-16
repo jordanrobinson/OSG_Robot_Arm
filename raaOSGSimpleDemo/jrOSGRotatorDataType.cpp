@@ -75,7 +75,6 @@ jrOSGRotatorDataType::jrOSGRotatorDataType(osg::Node* node) {
 }
 
 jrOSGRotatorDataType::~jrOSGRotatorDataType(void) {
-	unref();
 }
 
 void jrOSGRotatorDataType::updateRotation() {

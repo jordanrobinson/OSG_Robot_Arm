@@ -1,6 +1,7 @@
 #pragma once
 
 #include <osgGA\GUIEventHandler>
+#include <osgGA\NodeTrackerManipulator>
 #include <osgViewer\Viewer>
 
 #include "jrOSGRotatorConfig.h"
@@ -22,4 +23,5 @@ protected:
 	osg::ref_ptr<jrOSGRotatorDataType> g_pRotatorData;
 	double lastXPosition;
 	double lastYPosition;
+	osgGA::NodeTrackerManipulator* trackerManipulator;
 };
