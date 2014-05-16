@@ -20,4 +20,6 @@ jrOSGRotatorConfig::jrOSGRotatorConfig() {
 }
 
 
-jrOSGRotatorConfig::~jrOSGRotatorConfig(void) {}
+jrOSGRotatorConfig::~jrOSGRotatorConfig(void) {
+	rotator->unref();
+}

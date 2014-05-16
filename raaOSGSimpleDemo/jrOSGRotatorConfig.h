@@ -3,7 +3,7 @@
 #include <osg/Switch>
 #include <osg/Vec3d>
 
-class jrOSGRotatorConfig
+class jrOSGRotatorConfig: osg::Referenced
 {
 public:
 

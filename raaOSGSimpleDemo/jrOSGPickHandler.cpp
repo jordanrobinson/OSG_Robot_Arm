@@ -14,6 +14,8 @@ jrOSGPickHandler::jrOSGPickHandler(osgViewer::Viewer* view) {
 	jrOSGNodeFinder finder("Body_Rotator");
 	finder.traverse(*(viewer->getScene()->getSceneData()));
 	g_pRotatorData = dynamic_cast<jrOSGRotatorDataType*> (finder.getNode()->getUserData());
+	lastXPosition = 0;
+	lastYPosition = 0;
 }
 
 jrOSGPickHandler::~jrOSGPickHandler(void) {
@@ -30,34 +32,23 @@ bool jrOSGPickHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::GUIAction
 					  return true;
 			case '~': {
 				selectedRotator->rotateLeft = true;
-
-				//if(g_KeyswitchManipulator.valid()) {
-				//	viewer->setCameraManipulator( g_KeyswitchManipulator, false );
-				//	g_KeyswitchManipulator.release();
-				//} else {
-				//	g_KeyswitchManipulator = dynamic_cast<osgGA::KeySwitchMatrixManipulator*>(viewer->getCameraManipulator());
-				viewer->setCameraManipulator(nullptr, false);
-				//}
-					  }
-					  return true;
-			case 'a': {
-
-
-
-
-
-				//selectedRotator->rotateLeft = true;
-
-				//if(g_KeyswitchManipulator.valid()) {
-				//	viewer->setCameraManipulator( g_KeyswitchManipulator, false );
-				//	g_KeyswitchManipulator.release();
-				//} else {
-				//	g_KeyswitchManipulator = dynamic_cast<osgGA::KeySwitchMatrixManipulator*>(viewer->getCameraManipulator());
-				//viewer->setCameraManipulator(nullptr, false);
-				//}
 					  }
 					  return true;
 			}
+		}
+		else if (viewer && selectedRotator && ea.getModKeyMask() == 4) { // should be MOD_KEY_CTRL but that gives the wrong code, 12 instead of 4
+
+			if (ea.getYnormalized() > lastYPosition) {
+				selectedRotator->rotateLeft = true;
+			}
+			else if (ea.getYnormalized() < lastYPosition) {
+				selectedRotator->rotateRight = true;
+			}
+			lastXPosition = ea.getXnormalized();
+			lastYPosition = ea.getYnormalized();
+		}
+		else if (ea.getModKeyMask() == 0 && selectedRotator && viewer) {
+			selectedRotator->osgSwitch->setSingleChildOn(0);
 		}
 
 		switch(ea.getEventType()) {
@@ -104,4 +95,5 @@ bool jrOSGPickHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::GUIAction
 		default:
 			return false;
 		}
+
 }

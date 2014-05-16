@@ -20,4 +20,6 @@ protected:
 	osgViewer::Viewer* viewer;
 	jrOSGRotatorConfig* selectedRotator;
 	osg::ref_ptr<jrOSGRotatorDataType> g_pRotatorData;
+	double lastXPosition;
+	double lastYPosition;
 };

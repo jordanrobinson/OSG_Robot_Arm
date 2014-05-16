@@ -2,6 +2,8 @@
 
 #include "stdafx.h"
 
+#include <crtdbg.h>
+
 #include <osgDB/ReadFile>
 #include <osgViewer/Viewer>
 #include <osgGA/TrackballManipulator>
@@ -31,14 +33,19 @@ const static float csg_SpecCoef = 1.0f;
 osg::Group *g_pRoot = 0;
 
 int main(int argc, char* argv[]) {
+
+
 	osg::ArgumentParser arguments(&argc, argv);
 
 	g_pRoot = new osg::Group();
 	g_pRoot->ref();
 
 	// load model
-	if (osgDB::readNodeFiles(arguments)) {
-		g_pRoot->addChild(osgDB::readNodeFiles(arguments));
+	osg::Node* readIn = osgDB::readNodeFiles(arguments);
+	readIn->ref();
+
+	if (readIn) {
+		g_pRoot->addChild(readIn);
 	}
 	else {
 		std::cout << "Can't find valid osg file, so exiting.";
@@ -110,6 +117,14 @@ int main(int argc, char* argv[]) {
 	viewer.addEventHandler(new raaOSGSimpleEventHandler(&viewer));
 	viewer.addEventHandler(new jrOSGPickHandler(&viewer));
 
+	while(!viewer.done()) {
+		viewer.frame(); 
+	}
+
+	g_pRoot->unref();
+	readIn->unref();
+
 	return viewer.run();
+
 }
 

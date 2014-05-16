@@ -2,7 +2,7 @@
 
 #include <osg\Node>
 
-class jrOSGRotator {
+class jrOSGRotator: public osg::Referenced {
 public:
 	jrOSGRotator(void);
 	virtual ~jrOSGRotator(void);

@@ -75,6 +75,7 @@ jrOSGRotatorDataType::jrOSGRotatorDataType(osg::Node* node) {
 }
 
 jrOSGRotatorDataType::~jrOSGRotatorDataType(void) {
+	unref();
 }
 
 void jrOSGRotatorDataType::updateRotation() {
@@ -113,7 +114,7 @@ void jrOSGRotatorDataType::highlight(jrOSGRotatorConfig* config) {
 	if (config->rotateLeft || config->rotateRight) {
 		if (config->rotateAngle >= (config->maxAngle - (config->rotateSpeed * 1)) 
 			|| config->rotateAngle <= (config->minAngle + (config->rotateSpeed * 1))) {
-			config->osgSwitch->setSingleChildOn(2); // error state
+				config->osgSwitch->setSingleChildOn(2); // error state
 		} else {
 			config->osgSwitch->setSingleChildOn(1); // activated state
 		}

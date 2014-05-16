@@ -34,11 +34,15 @@ osg::ref_ptr<jrOSGRotatorDataType> rotatorData = 0;
 
 osg::Matrixd *savedProjectionMatrix = 0;
 
-raaOSGSimpleEventHandler::raaOSGSimpleEventHandler(osgViewer::Viewer* pViewer) {
+osg::Vec3d eye;
+osg::Vec3d center;
+osg::Vec3d up;
+
+raaOSGSimpleEventHandler::raaOSGSimpleEventHandler(osgViewer::Viewer* viewer) {
 	m_mMode = osg::PolygonMode::FILL;
 	if (!bodyRotateNode) {
 		jrOSGNodeFinder finder("Body_Rotator");
-		finder.traverse(*(pViewer->getScene()->getSceneData()));
+		finder.traverse(*(viewer->getScene()->getSceneData()));
 		bodyRotateNode = finder.getNode();
 		rotatorData = dynamic_cast<jrOSGRotatorDataType*> (bodyRotateNode->getUserData());
 		rotatorData->ref();
@@ -46,20 +50,24 @@ raaOSGSimpleEventHandler::raaOSGSimpleEventHandler(osgViewer::Viewer* pViewer) {
 	}
 	if (!rootNode) {
 		jrOSGNodeFinder rootFinder("Robot_Locator");
-		rootFinder.traverse(*(pViewer->getScene()->getSceneData()));
+		rootFinder.traverse(*(viewer->getScene()->getSceneData()));
 		rootNode = rootFinder.getNode();
 		rootNode->ref();
 	}
 }
 
 raaOSGSimpleEventHandler::~raaOSGSimpleEventHandler(void) {
+	bodyRotateNode->unref();
+	rootNode->unref();
+	rotatorData->unref();
+	unref();
 }
 
 bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::GUIActionAdapter &aa,
 	osg::Object *, osg::NodeVisitor *) {
-		osgViewer::Viewer *pViewer = dynamic_cast<osgViewer::Viewer*>(aa.asView());
+		osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer*>(aa.asView());
 
-		if(pViewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN) {
+		if(viewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN) {
 			switch(ea.getKey()) {
 			case 'b': {
 				rotatorData->hand3Config->rotateLeft = true;
@@ -113,12 +121,12 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 			case 'I': {
 				raaOSGPrintVisitor printer;
 
-				printer.traverse(*(pViewer->getScene()->getSceneData()));
+				printer.traverse(*(viewer->getScene()->getSceneData()));
 					  }
 					  return true;
 			case 'p':
 			case 'P':
-				pViewer->getSceneData()->getOrCreateStateSet()->setAttributeAndModes(
+				viewer->getSceneData()->getOrCreateStateSet()->setAttributeAndModes(
 					new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, progressMode()),
 					osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 				return true;
@@ -126,6 +134,9 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 				rotatorData->animate(0, rotatorData->bodyConfig);
 				rotatorData->animate(0, rotatorData->upperArmConfig);
 				rotatorData->animate(0, rotatorData->lowerArmConfig);
+				rotatorData->animate(0, rotatorData->hand1Config);
+				rotatorData->animate(0, rotatorData->hand2Config);
+				rotatorData->animate(0, rotatorData->hand3Config);
 					  }
 					  return true;
 			case '5': {
@@ -200,44 +211,35 @@ bool raaOSGSimpleEventHandler::handle(const osgGA::GUIEventAdapter &ea,	osgGA::G
 				}
 					  }
 					  return true;
-			case '/': {
+			case '@': {
 				osgDB::writeNodeFile(*(rootNode), "jrRobot.osg");
 					  }
 					  return true;
 
 			case '`': {
-				//scene->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+				
+				if (savedProjectionMatrix) {
+					osg::Matrixd *tempMatrix = savedProjectionMatrix;
+					savedProjectionMatrix = &(viewer->getCameraManipulator()->getMatrix());
+					viewer->getCameraManipulator()->setByMatrix(*tempMatrix);
+				}
+				else {
+					savedProjectionMatrix = &(viewer->getCameraManipulator()->getMatrix());
+				}
 
-				//osg::MatrixTransform* selection = new osg::MatrixTransform;
-				//selection->addChild(scene);
+				viewer->getCameraManipulator();
 
-				osgManipulator::TabPlaneDragger* d = new osgManipulator::TabPlaneDragger();
-				d->setupDefaultGeometry();
+				//viewer->getCamera()->getViewMatrixAsLookAt(eye, center, up);
 
-				rotatorData->bodyConfig->osgSwitch->addChild(d);
 
-				float scale = 40;
-				d->setMatrix(osg::Matrix::scale(scale, scale, scale) *
-					osg::Matrix::translate(rootNode->getBound().center()));
 
-				d->addTransformUpdating(dynamic_cast<osg::MatrixTransform*>(rotatorData->bodyConfig->rotator));
-				// we want the dragger to handle it's own events automatically
-				d->setHandleEvents(true);
-
-				// if we don't set an activation key or mod mask then any mouse click on
-				// the dragger will activate it, however if do define either of ActivationModKeyMask or
-				// and ActivationKeyEvent then you'll have to press either than mod key or the specified key to
-				// be able to activate the dragger when you mouse click on it.  Please note the follow allows
-				// activation if either the ctrl key or the 'a' key is pressed and held down.
-				d->setActivationModKeyMask(osgGA::GUIEventAdapter::MODKEY_CTRL);
-				d->setActivationKeyEvent('a');
 					  }
 					  return true;
 
 
 
 			}
-		} else if (pViewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYUP) {
+		} else if (viewer && ea.getEventType() == osgGA::GUIEventAdapter::KEYUP) {
 			switch(ea.getKey()) {
 			case 'b':
 			case 'B':

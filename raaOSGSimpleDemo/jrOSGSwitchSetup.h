@@ -2,7 +2,7 @@
 
 #include <osg\Group>
 
-class jrOSGSwitchSetup {
+class jrOSGSwitchSetup: osg::Referenced {
 public:
 	jrOSGSwitchSetup(void);
 	virtual ~jrOSGSwitchSetup(void);
